@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BE10 Reading Test — 完整模拟考</title>
+<style>
+  :root{
+    --purple:#51247a; --purple-light:#962a8b; --bg:#f6f4f9; --card:#fff;
+    --text:#2b2b2b; --muted:#6b6b7b; --green:#1e7d45; --red:#c0392b;
+    --amber:#b45309; --hl:#ffe066; --line:#e4dff0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.65;}
+  .topbar{position:sticky;top:0;z-index:50;background:var(--purple);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:9px 20px;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  .topbar .t1{font-weight:700;font-size:14.5px;}
+  .topbar .t2{font-size:12.5px;opacity:.85;}
+  .timer{font-variant-numeric:tabular-nums;font-size:24px;font-weight:700;
+    background:rgba(255,255,255,.14);padding:2px 15px;border-radius:8px;min-width:104px;text-align:center;transition:background .3s;}
+  .timer.warning{background:#e67e22;}
+  .timer.danger{background:var(--red);animation:pulse 1s infinite;}
+  @keyframes pulse{50%{opacity:.55;}}
+  .container{max-width:1180px;margin:0 auto;padding:22px 18px 90px;}
+  .card{background:var(--card);border-radius:12px;padding:24px 28px;margin-bottom:18px;
+    box-shadow:0 1px 4px rgba(60,40,90,.08);}
+  h1{color:var(--purple);font-size:23px;margin:0 0 6px;}
+  h2{color:var(--purple);font-size:19px;margin:0 0 12px;}
+  h3{font-size:16px;margin:18px 0 8px;color:var(--purple-light);}
+  .muted{color:var(--muted);font-size:14px;}
+  .hidden{display:none!important;}
+  button.primary{background:var(--purple);color:#fff;border:none;padding:12px 32px;
+    font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;transition:background .2s;}
+  button.primary:hover{background:var(--purple-light);}
+  button.ghost{background:transparent;color:var(--purple);border:1.5px solid var(--purple);
+    padding:9px 22px;font-size:14.5px;border-radius:8px;cursor:pointer;}
+  button.ghost:hover{background:#f0eaf7;}
+  .badge{display:inline-block;background:#efe8f7;color:var(--purple);border-radius:6px;
+    padding:1px 9px;font-size:12.5px;font-weight:600;}
+  .test-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:760px){.test-cards{grid-template-columns:1fr;}}
+  .test-card{border:1.5px solid var(--line);border-radius:12px;padding:20px;cursor:pointer;
+    transition:.15s;background:#fff;}
+  .test-card:hover{border-color:var(--purple);box-shadow:0 4px 14px rgba(81,36,122,.14);transform:translateY(-2px);}
+  .test-card h3{margin:0 0 8px;color:var(--purple);font-size:18px;}
+  .test-card ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted);}
+  .test-card li{margin-bottom:2px;}
+  .stage-progress{display:flex;gap:6px;align-items:center;}
+  .dot{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.22);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .dot.active{background:#fff;color:var(--purple);}
+  .dot.done{background:#8f6db3;}
+  .q-block{padding:18px 0;border-bottom:1px solid var(--line);}
+  .q-block:last-child{border-bottom:none;}
+  .q-num{font-weight:700;color:var(--purple);}
+  .q-stem{font-weight:600;margin:2px 0 10px;}
+  .para{margin:0 0 12px;}
+  .opt{display:block;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;margin-bottom:7px;cursor:pointer;transition:.12s;}
+  .opt:hover{border-color:var(--purple-light);background:#faf7fd;}
+  .opt input{margin-right:9px;}
+  .opt.sel{border-color:var(--purple);background:#f3ecfa;}
+  .grid2{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr;}}
+  .section-block{margin-bottom:16px;}
+  .section-letter{font-weight:800;color:var(--purple);font-size:16px;margin-right:6px;}
+  .side{position:sticky;top:64px;}
+  .headings-list{list-style:none;padding:0;margin:0;}
+  .headings-list li{padding:6px 10px;border-radius:6px;margin-bottom:2px;display:flex;gap:10px;font-size:14px;}
+  .headings-list li:nth-child(odd){background:#faf8fd;}
+  .headings-list .num{font-weight:700;color:var(--purple);min-width:26px;}
+  .answer-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+  .answer-row label{font-weight:600;min-width:90px;font-size:14px;}
+  .answer-row select{flex:1;padding:6px 9px;font-size:14px;border:1.5px solid #ccc;border-radius:6px;background:#fff;}
+  .answer-row select.dup{border-color:var(--amber);background:#fff7ea;}
+  .dup-warn{color:var(--amber);font-size:13px;margin-top:4px;}
+  .stmt{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;}
+  .stmt select{padding:6px 8px;font-size:14px;border:1.5px solid #ccc;border-radius:6px;background:#fff;min-width:64px;}
+  .gap-slot{background:#f3ecfa;border:1.5px dashed var(--purple-light);border-radius:8px;padding:10px 14px;margin:12px 0;}
+  .gap-slot label{font-weight:700;color:var(--purple);margin-right:10px;}
+  .gap-slot select{padding:6px 9px;font-size:14px;border:1.5px solid #ccc;border-radius:6px;background:#fff;}
+  .gap-slot select.dup{border-color:var(--amber);background:#fff7ea;}
+  .opt-list{list-style:none;padding:0;margin:0;}
+  .opt-list li{padding:9px 12px;border-radius:8px;margin-bottom:7px;background:#faf8fd;border:1px solid var(--line);font-size:14px;}
+  .opt-list .ol{font-weight:800;color:var(--purple);margin-right:6px;}
+  .highlightable{cursor:text;}
+  mark.hl{background:var(--hl);padding:0 1px;border-radius:2px;cursor:pointer;}
+  mark.hl:hover{background:#ffd43b;}
+  #hlBtn{position:absolute;z-index:99;background:#333;color:#fff;border:none;padding:5px 12px;
+    border-radius:6px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+  .hl-tip{font-size:13px;color:var(--muted);margin:6px 0 0;}
+  .score-big{font-size:50px;font-weight:800;color:var(--purple);line-height:1.1;text-align:center;}
+  .stage-scores{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0;}
+  .ss{background:#f3ecfa;border-radius:10px;padding:8px 16px;text-align:center;min-width:96px;}
+  .ss b{display:block;color:var(--purple);font-size:20px;}
+  .ss span{font-size:12.5px;color:var(--muted);}
+  table.results{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;}
+  table.results th,table.results td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  table.results th{background:#f2edf9;color:var(--purple);}
+  .ok{color:var(--green);font-weight:700;}
+  .bad{color:var(--red);font-weight:700;}
+  .center{text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="t1" id="tbTitle">BE10 Reading Test — 完整模拟考</div>
+    <div class="t2" id="tbSub">选择一套试卷开始</div>
+  </div>
+  <div class="stage-progress hidden" id="stageProgress"></div>
+  <div class="timer hidden" id="timer">--:--</div>
+</div>
+
+<button id="hlBtn" class="hidden">🖍 高亮</button>
+
+<div class="container" id="app"></div>
+
+<script>
+/* ============================================================
+   题库（全新三套，与旧题不重复）。规格对齐真实 FULL READING TEST：
+   Stage1 8题×2分钟(16分)；Stage2 7段/9标题(8分)；
+   Stage3 7段A-G/6题(可重复/有未用,11分)；Stage4 6空/7段(14分)。
+   ============================================================ */
+const TESTS = [
+/* ==================== TEST 1 ==================== */
+{
+  name:"Reading Test 1",
+  topics:"深海采矿 · 摩天大楼 · 盐 · 土豆",
+  stage1:{
+    time:960,
+    questions:[
+      { q:"What main point is the writer making about deep-sea mining?",
+        para:"Thousands of metres below the ocean surface lies a resource that industry has long coveted: potato-sized lumps of rock, scattered across the seabed, that are unusually rich in the metals needed for batteries and electronics. Mining companies argue that gathering these nodules could supply the raw materials for a cleaner, electrified future while avoiding the damage caused by mines on land. Marine scientists are far less certain. The deep sea floor, they point out, is one of the least understood environments on the entire planet, home to strange creatures found nowhere else, and machines scraping it bare could destroy ecosystems we have barely begun to study. The central question, then, is not whether these metals are valuable, but whether we truly understand the cost of taking them.",
+        options:{A:"It is the only possible source of the metals batteries need.",B:"Its true environmental cost is still poorly understood.",C:"Its benefits are obvious while its risks are trivial.",D:"It has already destroyed most of the deep sea floor."},
+        answer:"B",
+        explain:"主旨：这些金属虽有价值，但开采的真实代价我们还不清楚（least understood environment）。A、D 夸大；C 与作者「far less certain」的立场相反。" },
+      { q:"What is the writer doing in this passage?",
+        para:"Ask most parents and they will tell you, with complete confidence, that sugar makes children hyperactive; the chaos of a birthday party is routinely blamed on the cake. The belief is so widespread that it feels like plain common sense. Yet when researchers have given some children sugary drinks and others identical-tasting drinks containing no sugar at all — without telling anyone which was which — they have found no difference whatever in the children's behaviour. What did differ was the parents' judgement: those who believed their child had been given sugar rated them as noticeably more hyperactive, even when they had not. The famous 'sugar rush', it seems, may live mainly in the minds of the adults doing the watching.",
+        options:{A:"explaining the process by which sugar makes children hyperactive",B:"advising parents to avoid serving cake at children's parties",C:"debunking a widely held belief about sugar and behaviour",D:"describing how sugary drinks are manufactured and sold"},
+        answer:"C",
+        explain:"作者在戳破「糖让孩子亢奋」这一流行误解（found no difference whatever）。A 建立在错误前提上；B、D 均非本段所做的事。" },
+      { q:"What would make a good heading for this paragraph?",
+        para:"In an age when almost any song ever recorded can be streamed instantly and for free, one old technology has staged a genuinely unlikely comeback. Sales of vinyl records — those large black discs that once seemed destined only for museums — have risen every single year for well over a decade, and now outsell CDs in some countries. Part of the appeal is the warm, slightly imperfect sound; part is the simple pleasure of holding a physical object, with its large artwork and printed sleeve notes, in a world where music has otherwise become invisible. For many buyers, a record is no longer just a way to hear music but a thing to own, display and treasure.",
+        options:{A:"The surprising return of a physical format",B:"How vinyl records are manufactured today",C:"Why streaming has ruined the music industry",D:"The best-selling music albums of all time"},
+        answer:"A",
+        explain:"主旨：一种实体格式意外回归。B、D 与内容无关；C 与文中「comeback」的正面态度相反。" },
+      { q:"What is the writer concerned about in this paragraph?",
+        para:"It is one of the most ordinary substances imaginable, and yet the world is quietly running short of it. Sand — specifically the angular grains found in riverbeds and on the seabed — is the main ingredient of the concrete and glass from which our cities are built, and we now consume it far faster than rivers can produce it. Desert sand, smoothed and rounded by the wind, is useless for construction, so the pressure falls instead on rivers, beaches and coastlines, which are being stripped away, sometimes illegally, at enormous environmental cost. A resource we have always assumed to be effectively limitless is, without most people noticing, becoming genuinely scarce.",
+        options:{A:"the steadily rising cost of building materials in cities",B:"the difficulty of using desert sand for construction",C:"the pollution of rivers by large construction companies",D:"that a resource long assumed limitless is being used up at great cost"},
+        answer:"D",
+        explain:"作者担忧：一直被当作用之不竭的沙子正在被破坏性地耗尽。A、C 与本段无关；B 只是文中一处细节。" },
+      { q:"What main point is the writer making about gig work?",
+        para:"Delivering meals, driving passengers, completing small online tasks: millions of people now earn a living through apps that offer work by the job rather than by the hour. Supporters praise the flexibility, the freedom to choose when and how much to work. But this freedom comes with a catch that is easy to overlook. Gig workers are usually classed not as employees but as independent contractors, which means they receive no sick pay, no holiday pay, no pension and very little job security. The flexibility they are offered, in other words, is entirely real — but so is the protection they quietly give up in exchange for it.",
+        options:{A:"Gig work is the best kind of employment for most people.",B:"Gig work offers flexibility but at the cost of important protections.",C:"Gig workers reliably earn far more than traditional employees.",D:"Apps should be banned from offering any work by the job."},
+        answer:"B",
+        explain:"主旨：零工提供灵活性，代价是放弃了重要保障。A、C 与文意不符；D 是作者未提出的极端主张。" },
+      { q:"What can be concluded from this paragraph?",
+        para:"A dog's nose is a truly remarkable instrument. Where humans have around five million scent receptors, a dog may have three hundred million, and a far larger part of its brain is devoted to interpreting what it smells. Trained dogs can already detect explosives and drugs, and in carefully controlled trials some have identified samples from patients with certain cancers more accurately than existing laboratory tests. Researchers now wonder whether dogs are responding to faint chemical traces that our machines simply cannot yet detect — and whether, by studying exactly what the animals are sensing, we might one day build instruments that finally match them.",
+        options:{A:"Dogs will soon completely replace all medical laboratories.",B:"Machines are already far better than dogs at detecting cancer.",C:"A dog's sense of smell may point the way to new detection tools.",D:"Humans actually have more scent receptors than dogs do."},
+        answer:"C",
+        explain:"可推断：研究狗的嗅觉或能启发新的检测工具。A 夸大；B、D 与文中事实相反。" },
+      { q:"How does the writer feel about editing the genes of human embryos?",
+        para:"The ability to edit the genes of a human embryo, once pure science fiction, is now technically within reach, and its potential is genuinely dazzling: inherited diseases that have caused suffering for generations might simply be switched off before birth. And yet I find it hard to share the excitement entirely without reservation. The very same tools that could erase a fatal illness could, in principle, be used to select for height, intelligence or appearance, and the line between healing and enhancement is far blurrier than its most eager enthusiasts admit. Before we rush to rewrite the human blueprint, we would do well to ask not only what we can do, but who exactly gets to decide what counts as an improvement.",
+        options:{A:"wholeheartedly enthusiastic about all of its possible uses",B:"convinced that it should never even be researched",C:"impressed by its promise but uneasy about its wider use",D:"completely indifferent to the ethical questions it raises"},
+        answer:"C",
+        explain:"作者被其医疗前景打动（dazzling），却对「治疗与增强」的界限感到不安。A 过度肯定；B 过度否定；D 与全段的伦理关切相反。" },
+      { q:"What is the writer doing in this passage?",
+        para:"Roughly every two weeks, somewhere in the world, the last fluent speaker of a language dies, and with them an entire way of describing the world quietly disappears. It is tempting to see this as sad but ultimately unimportant — a natural thinning-out that leaves us with a few convenient global languages. That comfortable view, however, misses what is actually being lost. Each language carries knowledge accumulated over centuries — of local plants, weather, navigation and history — encoded in words that often have no equivalent anywhere else. When a language falls silent, we do not simply lose a set of unfamiliar sounds; we lose a unique library that no one ever thought to copy.",
+        options:{A:"challenging the idea that the loss of languages does not matter",B:"explaining the ordinary ways in which languages change over time",C:"arguing that a few global languages would be far more convenient",D:"describing which languages are currently the most widely spoken"},
+        answer:"A",
+        explain:"作者在反驳「语言消失无关紧要」的看法（That comfortable view misses...）。C 正是作者要驳斥的观点；B、D 均非本段所做的事。" }
+    ]
+  },
+  stage2:{
+    time:480,
+    title:"Reaching for the Sky: The Story of the Skyscraper",
+    headings:{
+      i:"The drawbacks felt at street level",
+      ii:"An old ambition once held back by materials",
+      iii:"Making tall buildings greener",
+      iv:"Why costly land pushed buildings upward",
+      v:"Two inventions that made great height possible",
+      vi:"An ambition unlikely ever to fade",
+      vii:"More than space: a symbol of pride",
+      viii:"How to design a small house with a garden",
+      ix:"Why cities ought to ban all tall buildings"
+    },
+    sections:{
+      A:"There is something in the human spirit that has always wanted to build upwards. Yet for most of history, height was strictly limited by the materials available. A tall stone building had to have immensely thick walls at its base to carry the enormous weight above, which made truly tall structures impractical. The skyscraper, as we know it, simply could not exist until that basic problem was solved.",
+      B:"The breakthrough came in the late nineteenth century with the steel frame. Instead of thick walls supporting the building, a skeleton of steel beams now carried the load, and the walls became a thin skin hung from the frame. Suddenly buildings could rise far higher without becoming impossibly heavy at the bottom. A second invention was just as important: the safe passenger lift, which at last made the upper floors of a tall building practical to reach.",
+      C:"Skyscrapers did not appear everywhere at once. They rose first in cities such as Chicago and New York, where land in the very centre was extraordinarily expensive and business was booming. When a small plot of ground costs a fortune, the only way to get more usable space out of it is to build upwards. Height, in these cities, was as much a matter of economics as of engineering.",
+      D:"Almost from the beginning, tall buildings were about more than space. A soaring tower announced the wealth and ambition of the company that built it, and cities and corporations competed fiercely to raise the tallest structure in the world. This race has never really stopped; today the record passes between ever-taller towers in the Middle East and Asia, each one a statement of national confidence.",
+      E:"Not everyone has admired the results. Critics argue that clusters of tall towers cast whole streets into permanent shadow, funnel fierce winds down to ground level, and can leave the areas around them feeling cold and inhuman. A city of giants, they warn, can be a distinctly uncomfortable place for the ordinary people walking about at its feet.",
+      F:"Modern skyscrapers face a further challenge: energy. A glass tower can trap heat like a greenhouse, demanding enormous amounts of power to keep cool. In response, architects now design buildings that shade themselves, open to catch passing breezes, and even generate some of their own energy, in an effort to make height sustainable as well as impressive.",
+      G:"Whether we should keep building upwards at all is a question that will only grow louder. Supporters argue that concentrating people in tall buildings saves land and shortens journeys; opponents reply that we could live perfectly well without towers at all. What seems certain is that, as long as land is scarce and human ambition is not, the urge to reach for the sky will endure."
+    },
+    answers:{A:"ii",B:"v",C:"iv",D:"vii",E:"i",F:"iii",G:"vi"},
+    explanations:{
+      A:"过去建筑的高度受材料限制（an old ambition held back by materials）。",
+      B:"两项发明——钢架 + 安全电梯——让高度成为可能。",
+      C:"中心地价昂贵，把建筑逼向高空（costly land）。",
+      D:"高楼不只为空间，更是财富与野心的象征。",
+      E:"高楼在街道层面的弊端（阴影、强风、冷漠）。",
+      F:"让高楼更环保（自遮阳、通风、自发电）。",
+      G:"只要土地稀缺、野心不减，向上建的冲动就不会消退。"
+    },
+    distractors:{
+      viii:"「如何设计带花园的小房子」与摩天楼主题无关，是操作指南。",
+      ix:"「城市应禁止一切高楼」——G 段只是提到有反对者，并未主张全面禁止。"
+    }
+  },
+  stage3:{
+    time:660,
+    title:"Salt: The Rock That Shaped History",
+    sections:{
+      A:"Salt is so cheap and common today that it is easy to forget how precious it once was. Yet the human body cannot live without it: salt helps our nerves fire, our muscles move and our bodies hold the right amount of water. For most of history, obtaining enough salt was a matter of sheer survival, and societies organised themselves around finding, trading and controlling it.",
+      B:"Salt was gathered in two main ways. In hot, dry regions near the sea, people channelled seawater into shallow ponds and let the sun evaporate it, leaving the salt behind. Elsewhere, salt was dug or pumped up as brine from underground deposits — the remains of ancient seas — and boiled until only the salt remained. Both methods demanded great effort, which is part of why salt was so valuable.",
+      C:"Before refrigeration, salt was the main way of keeping food from rotting. Meat and fish packed in salt could be stored for months and carried over long distances, which meant that armies could be fed on campaign and cities supplied right through the winter. Whole industries, and even the fortunes of entire nations, rested on the humble ability of salt to preserve food.",
+      D:"Because it was both essential and hard to obtain, salt was often treated almost as money. Roman soldiers, it is said, were partly paid in salt, and our very word 'salary' comes from the Latin word for it. Rulers throughout history taxed salt heavily, knowing that people had no choice but to buy it, and such taxes filled treasuries for centuries.",
+      E:"That same dependence made salt a powerful tool of protest. When a government controls something that everyone needs, controlling it becomes a form of power — and resisting that control becomes a form of rebellion. In 1930, Mahatma Gandhi led thousands of people on a long march to the sea to make their own salt in open defiance of British taxes, a simple act that became a symbol of resistance across India.",
+      F:"The salt trade also shaped the map itself. Ancient roads were built specifically to carry salt from where it was made to where it was needed, and towns grew up along these routes to serve the passing traders. Some of the great cities of Europe and Africa owe their original wealth to their position on a salt road, though few of their inhabitants remember it today.",
+      G:"In the modern world, salt has lost its old value. Industrial methods now produce it so cheaply, and in such vast quantity, that it is among the least expensive things we can buy, scattered on icy roads by the tonne. The mineral that once shaped empires and sparked rebellions has become, quietly, one more thing we take entirely for granted."
+    },
+    statements:[
+      {text:"an explanation of how salt allowed food to be stored and moved",answer:"C",explain:"C 段：盐能防腐，使肉鱼可久存、远运，供养军队和城市。"},
+      {text:"an example of salt at the centre of a political protest",answer:"E",explain:"E 段：1930 年甘地率众向海边进军制盐，反抗英国盐税。"},
+      {text:"an explanation of why the human body needs salt",answer:"A",explain:"A 段：盐帮助神经放电、肌肉运动、维持体内水分。"},
+      {text:"the origin of a common English word",answer:"D",explain:"D 段：单词 'salary' 源自拉丁语中的「盐」。"},
+      {text:"a description of two ways in which salt was produced",answer:"B",explain:"B 段：晒海水成盐 + 抽取地下卤水煮盐。"},
+      {text:"mention of salt once being used almost as money",answer:"D",explain:"D 段（再次）：罗马士兵部分以盐支薪，盐几乎被当作货币（与第 4 题同段的不同信息）。"}
+    ],
+    usedNote:"D 段被用了两次；F、G 段没有用到——与真实考试「部分可重复、部分用不到」一致。"
+  },
+  stage4:{
+    time:840,
+    title:"How the Potato Changed the World",
+    segments:[
+      {t:"text",c:"Few foods have changed history as quietly as the potato. Today it is one of the world's most important crops, grown on every inhabited continent. Yet when it first arrived in Europe, it was met not with gratitude but with deep suspicion."},
+      {t:"gap",n:1},
+      {t:"text",c:"The potato came originally from the high Andes of South America, where farmers had grown hundreds of different varieties for thousands of years. Spanish explorers carried it back to Europe in the sixteenth century, more as a curiosity than as anything to eat."},
+      {t:"gap",n:2},
+      {t:"text",c:"At first, Europeans wanted very little to do with it. The potato grew underground, in the dark, and belonged to the same plant family as several poisonous species. Many people were convinced it was unfit to eat, or even that it caused disease."},
+      {t:"gap",n:3},
+      {t:"text",c:"Gradually, however, attitudes began to change. Rulers and reformers, increasingly worried about how to feed growing populations, started actively promoting the potato. It could produce far more food from a given piece of land than grain, and it grew even in poor soils where little else would."},
+      {t:"gap",n:4},
+      {t:"text",c:"The results were dramatic. As the potato spread across northern Europe, populations that had often gone hungry began to grow rapidly. Some historians argue that the humble potato helped make possible the very rise in population on which the Industrial Revolution later depended."},
+      {t:"gap",n:5},
+      {t:"text",c:"But depending so heavily on a single crop carried a terrible risk. In the 1840s a disease swept through the potato fields of Ireland, where millions had come to rely on it almost entirely. The crop failed, and in the famine that followed around a million people died and many more were forced to emigrate."},
+      {t:"gap",n:6},
+      {t:"text",c:"The lesson was not that the potato had failed, but that no society should ever stake its survival on a single plant. Today the potato feeds billions, and scientists carefully preserve its many wild varieties — a quiet insurance against the dangers of relying on too few."}
+    ],
+    options:{
+      A:"In some regions this suspicion was strong enough to be written into law, and for a time the potato was banned outright. Elsewhere it was grown only to feed animals, or the very poorest people who had no other choice.",
+      B:"The disaster sent shockwaves far beyond Ireland and forced governments across Europe to think again about how their people were fed. It remains one of the clearest warnings in all of history of what can happen when a whole population leans on one crop.",
+      C:"Potatoes are not, botanically speaking, roots at all, but swollen underground stems called tubers, which store the energy the plant will need to grow again the following year. A single plant can produce a dozen or more of them.",
+      D:"That a plant now so utterly familiar should once have been feared seems strange to us today. But the potato's journey from suspicion to staple took more than two centuries, and it reshaped whole nations along the way.",
+      E:"Yet this sudden abundance came to rest on surprisingly narrow foundations. Across whole regions, families now ate potatoes at nearly every meal, with very little to fall back on if anything should ever go wrong.",
+      F:"For a long time it remained exactly that. Grown in botanical gardens and admired mainly for its flowers, the potato was treated as an exotic ornament rather than a serious source of food.",
+      G:"One famous campaigner even posted guards around his potato fields to make the crop seem valuable, knowing that ordinary people would want to steal whatever was so carefully protected. Such tricks, along with plain hunger, slowly overcame the old prejudice."
+    },
+    answers:{1:"D",2:"F",3:"A",4:"G",5:"E",6:"B"},
+    unused:"C",
+    explanations:{
+      1:"承接开头「met with suspicion」——D 段点明「从被惧怕到成为主食」的两百年旅程，预告全文；下文讲它来自安第斯山。",
+      2:"上文「带回欧洲只当作稀奇物」——F 段延续（remained exactly that），说它被当作观赏植物而非食物。",
+      3:"上文欧洲人抗拒、认为有毒——A 段进一步说有的地方立法禁种、只拿来喂牲口。",
+      4:"上文统治者开始推广、产量高——G 段举例（派卫兵看守以显其珍贵），说明如何克服偏见。",
+      5:"上文人口因土豆迅速增长——E 段指出这种繁荣建立在脆弱的单一作物之上，埋下隐患。",
+      6:"上文爱尔兰大饥荒、百万人死——B 段说灾难震动欧洲，成为「依赖单一作物」的警示；下文总结教训。",
+      unused:"C（土豆在植物学上是块茎而非根…）只是植物学事实，与全文「引入 → 抗拒 → 推广 → 繁荣 → 灾难」的叙事无关。"
+    }
+  }
+},
+
+/* ==================== TEST 2 ==================== */
+{
+  name:"Reading Test 2",
+  topics:"清洁能源 · 货币史 · 候鸟迁徙 · 黄石狼群",
+  stage1:{
+    time:960,
+    questions:[
+      { q:"What main point is the writer making about renewable energy?",
+        para:"Wind and solar power have become dramatically cheaper, and on a bright, breezy day they can now supply more electricity than a whole country needs. The difficulty is that the sun eventually sets and the wind often drops, frequently just when demand is at its highest. For renewable energy to fully replace fossil fuels, we therefore need ways to store vast amounts of electricity and release it later — and here progress has been far slower. Batteries are improving quickly but remain expensive at the scale required, and other solutions, from pumping water uphill to producing hydrogen, each have serious limits of their own. The future of clean energy may depend less on generating power than on storing it.",
+        options:{A:"Storing electricity, not generating it, is now the central challenge.",B:"Renewable energy is simply too expensive ever to replace fossil fuels.",C:"Batteries have already completely solved the storage problem.",D:"Wind and solar can never supply enough electricity for a country."},
+        answer:"A",
+        explain:"主旨：难点已从「发电」转向「储电」。B、D 与「更便宜、能超需求」相反；C 与「batteries remain expensive」相反。" },
+      { q:"What is the writer doing in this passage?",
+        para:"It is often said that a goldfish has a memory of only three seconds, forgetting the entire world afresh with every lap of its bowl. The claim is a convenient excuse for keeping the fish in a tiny tank, but it is simply not true. In experiments, goldfish have learned to push levers to receive food, to recognise the particular person who feeds them, and to find their way through mazes, remembering what they have learned for months afterwards. Far from being mindless, the goldfish turns out to be a modestly capable learner — and the myth of its three-second memory says far more about our willingness to believe convenient things than it does about the fish.",
+        options:{A:"explaining exactly why goldfish have such short memories",B:"correcting a widely believed but false claim about goldfish",C:"advising readers on how to keep pet goldfish healthy",D:"describing how goldfish are commonly used in experiments"},
+        answer:"B",
+        explain:"作者在纠正「金鱼只有三秒记忆」这一错误说法（simply not true）。A 建立在错误前提上；C、D 均非本段所做的事。" },
+      { q:"What would make a good heading for this paragraph?",
+        para:"Not long ago, the idea that watching other people play video games could fill an entire stadium would have seemed absurd. Today, competitive gaming — widely known as 'e-sports' — draws live audiences of millions, offers prize funds that rival traditional sporting events, and supports full-time professional players with their own coaches, sponsors and gruelling training schedules. Some universities now award scholarships for it, and there are serious arguments that it should one day feature in the Olympic Games. Whatever one happens to think of it, e-sports has quietly become one of the fastest-growing forms of entertainment anywhere in the world.",
+        options:{A:"How to become a better video game player",B:"Why video games are harmful to young people",C:"Competitive gaming grows into a major spectator sport",D:"A short history of the modern Olympic Games"},
+        answer:"C",
+        explain:"主旨：电子竞技发展成一项大型观赏运动。A、B、D 均与内容不符或只是枝节。" },
+      { q:"What is the writer concerned about in this paragraph?",
+        para:"The world's beaches — those simple strips of sand where the land meets the sea — are quietly vanishing. As sea levels rise and storms grow fiercer, the waves eat away at coastlines faster than sand can naturally replace it, and in many places the buildings crowded right up to the shore leave the beach nowhere to retreat. Sand is trucked in at great expense to replace what has been lost, but this too soon washes away. If current trends continue, a large share of the world's sandy coastlines could be gone by the end of the century, taking with them both a way of life and a valuable natural defence against the sea.",
+        options:{A:"the steadily rising cost of building houses near the coast",B:"the difficulty of finding good-quality sand for beaches",C:"the falling number of people choosing to visit beaches",D:"that the world's beaches are being lost, with damaging effects"},
+        answer:"D",
+        explain:"作者担忧海滩正在消失，并带来生活方式与天然屏障的损失。A、B、C 均非本段的核心关注。" },
+      { q:"What main point is the writer making about working from home?",
+        para:"When millions of office workers were suddenly sent home, many employers feared that productivity would simply collapse. In fact, for a great deal of desk-based work, it did not; some studies found that people got just as much done, or even more, once freed from the daily commute. But the picture is not a simple one. Working from home can blur the line between work and rest until the two bleed into each other, and it can leave newer employees isolated, cut off from the casual conversations through which people quietly learn and build trust. The real question is no longer whether remote work is possible, but how to keep its benefits without losing what the office quietly used to provide.",
+        options:{A:"Remote work can succeed, but the office offered things worth preserving.",B:"Remote work always makes people significantly less productive.",C:"Remote work has no real disadvantages whatsoever.",D:"Everyone ought to return to the office on a full-time basis."},
+        answer:"A",
+        explain:"主旨：远程办公行得通，但办公室有值得保留的价值。B、C 走极端，均与文意相反；D 是作者未主张的结论。" },
+      { q:"What can be concluded from this paragraph?",
+        para:"We tend to think of memory as a kind of recording, faithfully replaying past events exactly as they happened. Research on eyewitnesses tells a very different story. Studies have repeatedly shown that people can be led to 'remember' details that were never actually there — a broken headlight, a weapon, even entire events from childhood — simply through the way a question is worded afterwards. Memory, it seems, is less like a video than like a story we retell, quietly editing and reshaping it each time we do. This matters enormously in a courtroom, where a confident witness can be both completely sincere and completely wrong.",
+        options:{A:"Eyewitness memory is almost always perfectly accurate.",B:"A witness can be entirely honest and yet remember events wrongly.",C:"People are never able to remember anything from their childhood.",D:"Courtrooms should ignore every kind of witness statement."},
+        answer:"B",
+        explain:"可推断：证人可以既真诚又记错。A 与研究相反；C 夸大（文中说童年记忆可被植入）；D 是文中未作的极端主张。" },
+      { q:"How does the writer feel about nuclear power?",
+        para:"Nuclear power provokes strong feelings, and I understand exactly why: the accidents, though rare, have been genuinely frightening, and the waste will remain dangerous for longer than any government has yet existed. And yet, looking honestly at the numbers, I find the case surprisingly difficult to dismiss. Nuclear plants produce enormous amounts of electricity with almost no carbon emissions, and per unit of energy they have caused far fewer deaths than coal or oil. I am certainly not blind to the risks, but in a rapidly warming world I have come, somewhat reluctantly, to believe that refusing even to consider nuclear power may well be the greater danger.",
+        options:{A:"completely opposed to it under any circumstances at all",B:"enthusiastically in favour of it with no reservations",C:"reluctantly supportive of it despite genuine concerns",D:"entirely indifferent to the whole question"},
+        answer:"C",
+        explain:"作者虽承认风险（reluctantly），但认为拒绝核电或许更危险，属「勉强支持」。A、B 走极端；D 与全段的纠结态度相反。" },
+      { q:"What is the writer doing in this passage?",
+        para:"The clothes in a typical shop have never been cheaper, and we have never bought quite so many of them. A dress worn once and then discarded, a shirt that costs less than lunch — this is the world that 'fast fashion' has created. It is easy to celebrate this as something democratic: beautiful clothes, once a luxury reserved for the few, now well within everyone's reach. But the true price is paid elsewhere — in the rivers dyed strange colours by textile factories, the mountains of barely worn clothing sent to landfill, and the workers paid a pittance to keep the racks endlessly full. What looks like an unbeatable bargain, on closer inspection, turns out to be a cost that has simply been moved out of sight.",
+        options:{A:"celebrating fast fashion as something good for absolutely everyone",B:"explaining in detail how modern clothes are manufactured",C:"advising readers on how to dress more fashionably",D:"exposing the hidden costs behind cheap, disposable clothing"},
+        answer:"D",
+        explain:"作者在揭示廉价快时尚背后被转移、被隐藏的代价（moved out of sight）。A 与批评立场相反；B、C 均非本段所做的事。" }
+    ]
+  },
+  stage2:{
+    time:480,
+    title:"From Shells to Screens: A Short History of Money",
+    headings:{
+      i:"What really gives money its value",
+      ii:"Money as mere numbers on a screen",
+      iii:"The problem that money was invented to solve",
+      iv:"A new kind of money beyond government control",
+      v:"A stamped guarantee that spread quickly",
+      vi:"The drawbacks of using useful objects as money",
+      vii:"Replacing heavy metal with lightweight notes",
+      viii:"Practical tips for saving money each month",
+      ix:"Why gold is the most beautiful of all metals"
+    },
+    sections:{
+      A:"Before money existed, people are often said to have swapped goods directly: a farmer might trade grain for a pair of shoes. The trouble with such barter is fairly obvious. The shoemaker must actually happen to want grain, and both sides must somehow agree how much grain a pair of shoes is really worth. Money was invented to solve exactly this problem — a single thing that everyone will accept, and against which the value of everything else can be measured.",
+      B:"The earliest money was often something useful or beautiful in its own right. Cattle, grain, salt and rare shells have all served as money in different societies. Such objects worked because people valued them anyway, but they were also awkward: cattle cannot be divided, grain slowly rots, and shells can be gathered by anyone who stumbles on the right beach.",
+      C:"The first true coins appeared around 2,600 years ago in what is now Turkey, made of a natural mixture of gold and silver and stamped with an official mark. That stamp was a guarantee of weight and purity, so that people no longer had to weigh the metal at every single transaction. Coins were durable, portable and easily counted, and the idea spread with remarkable speed across the ancient world.",
+      D:"Carrying large amounts of coin was heavy and often dangerous, and so, many centuries later, paper money was born — first in China, where merchants left their coins with trusted agents and carried lightweight notes instead. At first each note could be exchanged for real metal, but over time governments issued paper that was simply declared to be money, backed by nothing more than public confidence in the state.",
+      E:"This points to the strange truth lying at the very heart of money. A banknote is only a piece of paper, and a coin is worth far more as money than as metal. What actually gives money its value is not the material it happens to be made of, but a shared agreement to accept it. Money, in the end, is really a kind of collective trust.",
+      F:"Today most money is not physical at all. The pounds or dollars sitting in a bank account are simply numbers stored in a computer, moved from one account to another with a tap of a card or a phone. Very little of the money in the world now exists as notes and coins; the overwhelming rest is pure information, flickering silently between machines.",
+      G:"The latest chapter is still being written. Digital currencies such as Bitcoin attempt to create money that no government controls, kept secure by networks of computers rather than by any central bank. Whether such currencies eventually become everyday money or remain a curiosity, they raise once again the oldest question of all about money: what, exactly, makes people willing to accept it?"
+    },
+    answers:{A:"iii",B:"vi",C:"v",D:"vii",E:"i",F:"ii",G:"iv"},
+    explanations:{
+      A:"货币被发明是为了解决以物易物的难题。",
+      B:"用有用之物当钱的种种不便（牛不能分、粮会烂、贝壳谁都能捡）。",
+      C:"盖章的钱币是重量与纯度的保证，迅速传播。",
+      D:"用轻便的纸币取代沉重的金属。",
+      E:"真正赋予货币价值的是「共同接受」的信任。",
+      F:"如今的钱多是电脑里的数字。",
+      G:"一种不受政府控制的新型货币（加密货币）。"
+    },
+    distractors:{
+      viii:"「每月省钱的实用技巧」是理财建议，与货币史主题无关。",
+      ix:"「黄金为何最美」——文中提到金银铸币，但从未讨论黄金的美，属细节误导。"
+    }
+  },
+  stage3:{
+    time:660,
+    title:"The Great Migrations of Birds",
+    sections:{
+      A:"Twice a year, billions of birds take to the skies in one of nature's greatest spectacles. Fleeing the cold and searching for food, they travel from their breeding grounds to warmer regions and back again, some crossing entire oceans and continents on the way. A few make journeys so long they are almost hard to believe: the Arctic tern flies from pole to pole and back every single year, a round trip of tens of thousands of kilometres.",
+      B:"How birds actually find their way across such vast distances has long puzzled scientists. They appear to use several methods at once: the position of the sun by day and the stars by night, familiar landmarks such as coastlines and rivers, and, most remarkably of all, the Earth's magnetic field, which some birds seem able to sense directly. Young birds of some species inherit the route, while others must learn it by following older, experienced birds.",
+      C:"Migration demands extraordinary physical preparation. In the weeks before departure, many birds eat vast amounts and can nearly double their body weight, storing the fat as fuel for the journey. Some are then able to fly for days on end without stopping; one small shorebird has been tracked flying more than 11,000 kilometres across the Pacific without once landing to rest or feed.",
+      D:"Such journeys are, unsurprisingly, perilous. Storms can blow exhausted birds far off course and out to sea, predators lie in wait at traditional resting sites, and many birds simply run out of energy before they arrive. It is estimated that a large proportion of young birds do not survive their very first migration, which makes the safe arrival of the rest all the more remarkable.",
+      E:"In more recent times, people have added dangerous new hazards. Tall glass buildings and communication towers, brightly lit at night, confuse and kill migrating birds in enormous numbers. Just as serious is the loss of the wetlands and forests where birds stop to rest and feed along the way; without these vital refuelling stations, even the strongest flyer cannot hope to complete its journey.",
+      F:"Because migrating birds cross so many national borders, protecting them requires countries to cooperate. A wetland carefully saved in one nation is worthless if the birds' next stop, a thousand kilometres further on, is drained and built over. Conservationists increasingly think of a whole migratory route as a single connected system that must be protected along its entire length.",
+      G:"New technology is transforming what we know. Tracking devices small enough to fit on a bird's back now reveal these journeys in astonishing detail, showing exactly where the birds go and precisely where they run into trouble. Armed with this information, conservationists can identify the most important sites and, in some cases, have already helped struggling populations to recover."
+    },
+    statements:[
+      {text:"reference to migrating birds being killed by tall, brightly lit buildings",answer:"E",explain:"E 段：夜间灯火通明的玻璃高楼和信号塔大量撞死候鸟。"},
+      {text:"an example of a bird that flies between the two poles",answer:"A",explain:"A 段：北极燕鸥每年往返两极，行程数万公里。"},
+      {text:"how small tracking devices have transformed our knowledge",answer:"G",explain:"G 段：微型追踪器揭示了迁徙路线的细节和遇险地点。"},
+      {text:"the several different methods birds use to find their way",answer:"B",explain:"B 段：候鸟同时借助太阳、星辰、地标和地磁场导航。"},
+      {text:"mention of the loss of places where birds stop to rest and feed",answer:"E",explain:"E 段（再次）：湿地与森林等「补给站」的丧失同样致命（与第 1 题同段的不同信息）。"},
+      {text:"an example of birds greatly increasing their weight before a journey",answer:"C",explain:"C 段：出发前许多鸟大量进食，体重几乎翻倍以储备脂肪。"}
+    ],
+    usedNote:"E 段被用了两次；D、F 段没有用到——与真实考试「部分可重复、部分用不到」一致。"
+  },
+  stage4:{
+    time:840,
+    title:"How Wolves Changed a River",
+    segments:[
+      {t:"text",c:"When the last wolves in Yellowstone National Park were killed off in the 1920s, very few people mourned them. Wolves were widely seen as dangerous pests, and their removal was thought to be good for both people and the park's other animals. What actually followed, however, surprised everyone."},
+      {t:"gap",n:1},
+      {t:"text",c:"Without wolves to hunt them, the park's elk multiplied and grew bold. Large herds now grazed wherever they pleased, and they lingered for long periods in the valleys and along the riverbanks, eating the young trees and shrubs faster than these could ever grow back."},
+      {t:"gap",n:2},
+      {t:"text",c:"Over the following decades, the effects spread quietly through the whole ecosystem. As the willows and aspens along the rivers disappeared, so did the beavers that depended on them for food and dam-building, and the songbirds that had nested in them. The park was becoming steadily quieter and less varied, though few people understood exactly why."},
+      {t:"gap",n:3},
+      {t:"text",c:"In 1995, after a great deal of debate, wolves were finally brought back. A small number were captured in Canada and released into the park, watched anxiously by scientists who were genuinely unsure what would happen. The wolves settled in and began, once again, to hunt the elk."},
+      {t:"gap",n:4},
+      {t:"text",c:"The elk did not simply fall in number; they also changed their behaviour. Now wary of predators once more, they no longer lingered in the open valleys and exposed riverbanks where they could be so easily caught. For the first time in decades, the young trees in these places were left alone long enough to grow."},
+      {t:"gap",n:5},
+      {t:"text",c:"As the trees returned, so too did much else. Beavers came back to feed on the willows and build their dams, creating ponds that soon sheltered fish and frogs. Birds returned to the new woodland, and the riverbanks, held firmly together by roots once more, stopped crumbling and even began to change shape."},
+      {t:"gap",n:6},
+      {t:"text",c:"The story of Yellowstone's wolves has become famous precisely because it shows how deeply the parts of nature are connected. Remove a single predator, and a river itself can change its course; return it, and a whole living landscape can slowly begin to heal."}
+    ],
+    options:{
+      A:"By the 1990s it had become clear that something was badly wrong, and attention slowly turned to the missing predator. Perhaps, some scientists began to argue, the park simply could not be healthy without the very animal that had once been so eagerly removed.",
+      B:"In this way, the return of a single predator had reached all the way to the shape of the land itself. The rivers now ran clearer and steadier than they had for generations.",
+      C:"Far from flourishing, the park slowly began to suffer instead. The removal of a single animal, it turned out, had quietly set off a whole chain of changes that absolutely no one had predicted.",
+      D:"Wolves live and hunt in family groups called packs, usually led by a single breeding pair. A pack works closely together to bring down animals far larger than any single wolf could ever tackle alone, such as elk or bison.",
+      E:"What began as a change in just a few trees soon rippled outward. As the willows and aspens rose once more along the water, they created homes and food for creatures that had been absent for years.",
+      F:"The riverbanks suffered most of all. Stripped of the trees and shrubs whose roots had once held the soil together, they began to erode and collapse into the moving water.",
+      G:"At first, the change was simply one of numbers: the wolves killed enough elk to reduce the swollen herds. But the most important effect of their return turned out to be something far subtler."
+    },
+    answers:{1:"C",2:"F",3:"A",4:"G",5:"E",6:"B"},
+    unused:"D",
+    explanations:{
+      1:"承接「surprised everyone」——C 段说公园不升反衰，移除一种动物引发了无人预料的连锁变化；下文讲麋鹿失控。",
+      2:"上文麋鹿啃光河岸的幼树灌木——F 段说河岸因失去固土的根系而崩塌入水。",
+      3:"上文生态变差却少有人知原因——A 段写到 1990 年代人们才把注意力转向「缺失的捕食者」；下文引出 1995 年重引入。",
+      4:"上文狼开始猎鹿——G 段先说数量减少，再点出「更重要的是更微妙的影响」；下文正是讲麋鹿行为改变。",
+      5:"上文幼树得以生长——E 段说这变化向外扩散，柳树白杨为多年不见的生物提供了栖所；下文讲河狸鸟类归来。",
+      6:"上文河岸稳固、改变形态——B 段总结：一种捕食者的回归影响到土地本身，河流更清更稳；下文点出主旨。",
+      unused:"D（狼群以家庭为单位协作捕猎…）只是关于狼社会行为的事实，与全文「移除—衰退—重引入—恢复」的因果叙事无关。"
+    }
+  }
+},
+
+/* ==================== TEST 3 ==================== */
+{
+  name:"Reading Test 3",
+  topics:"游戏与谬误 · 冰川 · 蜘蛛丝 · 经度难题",
+  stage1:{
+    time:960,
+    questions:[
+      { q:"What main point is the writer making about play?",
+        para:"Play is often dismissed as the very opposite of serious activity — something children simply do until they are old enough to get on with real life. Biologists who study animals, however, see it quite differently. Young mammals, from kittens to dolphins, spend enormous energy on play, despite the real risk of injury and the attention it can draw from predators, which strongly suggests it must serve some vital purpose. Through play, young animals appear to rehearse the very skills they will need as adults — hunting, fighting, cooperating — but in a safe and forgiving form. Far from being a waste of time, play may in fact be one of the most serious things the young of any species can do.",
+        options:{A:"Play is a purposeful activity that helps the young develop vital skills.",B:"Play is really just a way for young animals to pass the time.",C:"Only human children genuinely benefit from playing.",D:"Play is far too dangerous for young animals to be worthwhile."},
+        answer:"A",
+        explain:"主旨：游戏并非浪费时间，而是帮助幼体演练关键技能。B、C、D 均与文中「serves a vital purpose」相反。" },
+      { q:"What is the writer doing in this passage?",
+        para:"'Lightning never strikes the same place twice' is one of those sayings people repeat as though it were a firm law of nature. It is, in fact, comprehensively false. Lightning is simply drawn to the tallest, most exposed points around, and once a particular spot has proved attractive it will be just as attractive during the very next storm. The Empire State Building in New York is struck by lightning around twenty-five times a year. The phrase survives not because it is true, but because it makes such a comforting metaphor: the reassuring idea that misfortune, having struck us once, will now politely leave us alone.",
+        options:{A:"explaining the reasons why lightning tends to avoid tall buildings",B:"correcting a popular saying that is actually factually untrue",C:"advising readers on how to stay safe during a thunderstorm",D:"describing the process by which lightning forms inside clouds"},
+        answer:"B",
+        explain:"作者在纠正一句流传甚广却不实的谚语（comprehensively false）。A 与事实相反（闪电偏爱高楼）；C、D 均非本段所做的事。" },
+      { q:"What would make a good heading for this paragraph?",
+        para:"A century ago, electric trams rattled through the streets of cities all over the world. Then, in the age of the motor car, most of them were torn up and quietly forgotten, dismissed as slow and hopelessly old-fashioned. Now, however, they are returning. Faced with choking traffic and dirty air, dozens of cities are laying down brand-new tram lines, and discovering that a single tram can move far more people than a whole road full of cars while producing no exhaust at all. What was once thrown away as a relic is being rediscovered as a remarkably modern solution.",
+        options:{A:"How modern electric trams are built",B:"Why cars will always beat public transport",C:"An old form of transport returns to the city",D:"A detailed history of the motor car"},
+        answer:"C",
+        explain:"主旨：一种旧交通工具（有轨电车）重新回到城市。A、B、D 均与内容不符或只是枝节。" },
+      { q:"What is the writer concerned about in this paragraph?",
+        para:"We are, at least in theory, more connected than any generation in human history, able to reach almost anyone at all at the touch of a screen. And yet in many countries the number of people who say they feel deeply and persistently lonely is steadily rising, especially among the young and the very old. Loneliness is not merely unpleasant; sustained isolation has been firmly linked to poorer health and even shorter lives, its effects compared by some researchers to those of smoking. That so many people should feel so profoundly alone in the middle of crowded, hyper-connected cities is a quiet emergency we have been remarkably slow to take seriously.",
+        options:{A:"the steadily rising cost of modern communication technology",B:"the difficulty many people have in using screens to contact others",C:"the falling number of people now choosing to live in big cities",D:"that loneliness is rising and seriously harming people despite constant connectivity"},
+        answer:"D",
+        explain:"作者担忧：在高度互联的时代，孤独感反而上升并严重损害健康。A、B、C 均非本段关注的核心。" },
+      { q:"What main point is the writer making about 'free' apps?",
+        para:"The most popular apps on our phones cost absolutely nothing to download, and we happily call them free. But a service run by a large company with thousands of employees must be paid for somehow, and if we are not paying for it with money, then we are certainly paying with something else. That something is our attention and our personal data, quietly harvested and then sold to advertisers who want to influence what we buy and even what we believe. The apps themselves are designed, with enormous skill, to keep us scrolling for as long as they possibly can. 'Free', it turns out, may be one of the most expensive words in the entire modern economy.",
+        options:{A:"'Free' apps are actually paid for with our attention and personal data.",B:"Free apps are a genuine gift from unusually generous companies.",C:"Apps that cost money are always worse than the free ones.",D:"People really ought never to download any apps at all."},
+        answer:"A",
+        explain:"主旨：所谓「免费」其实是用注意力和个人数据支付的。B 与文意相反；C、D 是文中未作的主张。" },
+      { q:"What can be concluded from this paragraph?",
+        para:"On a remote Pacific island, crows do something once believed to be unique to humans and a handful of apes: they make and use tools. A New Caledonian crow will snap off a twig, carefully trim it to shape, and then use it to winkle fat grubs out of holes in the wood, and some individuals even bend lengths of wire into neat hooks. In captivity, these birds have solved puzzles requiring several separate steps in exactly the right order, apparently planning ahead as they go. Findings like these are steadily dismantling the old assumption that sophisticated intelligence belongs to human beings alone.",
+        options:{A:"Crows are now known to be more intelligent than human beings.",B:"Complex intelligence is not confined to humans, as was once believed.",C:"Only crows raised in captivity are able to use tools at all.",D:"Using tools has, in fact, nothing to do with intelligence."},
+        answer:"B",
+        explain:"可推断：复杂智力并非人类独有。A 夸大；C 与「野外乌鸦也会用工具」相反；D 与全段主旨相反。" },
+      { q:"How does the writer feel about teenagers and smartphones?",
+        para:"Whenever I see a group of teenagers sitting together in complete silence, each one lost in a separate glowing screen, I feel a familiar sense of unease. It would be very easy to turn that unease into a sweeping condemnation, and plenty of writers have done exactly that. But I try hard to resist. The same devices that can isolate a lonely teenager can also connect one who feels different to others just like them, and the actual research on whether screens truly harm young minds is far messier and less alarming than the headlines tend to suggest. My worry is genuine, but so too is my suspicion that we are far too quick to blame a device for problems that are older and deeper than any phone.",
+        options:{A:"absolutely certain that smartphones are destroying young people",B:"completely relaxed and entirely untroubled about the issue",C:"uneasy about them yet cautious about blaming them too simply",D:"convinced that smartphones have no effect on teenagers at all"},
+        answer:"C",
+        explain:"作者既有真切的担忧（unease），又警惕把问题简单归咎于手机。A、D 走极端；B 与「my worry is genuine」相反。" },
+      { q:"What is the writer doing in this passage?",
+        para:"We love the story of the self-made success: the individual who, through sheer talent and relentless hard work, rises from nothing at all to the very top, owing their triumph to no one but themselves. It is an inspiring tale, and there is real truth in it. But it also quietly ignores a great deal — the teachers who first taught them, the public roads and schools and hospitals that supported them, the sheer luck of having been born in the right place at the right time. Nobody, in truth, succeeds entirely alone, and pretending otherwise makes us less grateful, and less willing to build the very ladders that let others climb after us.",
+        options:{A:"celebrating people who succeed entirely through their own efforts",B:"questioning the idea that anyone truly succeeds all on their own",C:"explaining a reliable method for becoming a successful person",D:"describing the typical daily routines of very wealthy people"},
+        answer:"B",
+        explain:"作者在质疑「白手起家、全靠自己」的神话（Nobody succeeds entirely alone）。A 正是被质疑的观点；C、D 均非本段所做的事。" }
+    ]
+  },
+  stage2:{
+    time:480,
+    title:"Rivers of Ice: The Story of Glaciers",
+    headings:{
+      i:"How moving ice reshapes the land",
+      ii:"A frozen archive of the ancient climate",
+      iii:"What a glacier actually is",
+      iv:"Why melting glaciers threaten us all",
+      v:"Born from snow, packed down over centuries",
+      vi:"A natural store of water for millions",
+      vii:"Shrinking ice in a warming world",
+      viii:"How to stay safe when climbing a glacier",
+      ix:"The reason that fresh snow looks white"
+    },
+    sections:{
+      A:"A glacier is, in the very simplest terms, a river of ice. It is a mass of ice so large and so heavy that it slowly flows downhill under its own great weight, moving perhaps only a few centimetres in a day. Glaciers cover about a tenth of the Earth's land surface and hold most of the planet's fresh water, locked away in frozen form high on mountains and at the poles.",
+      B:"Glaciers are born from snow. In places cold enough that more snow falls each winter than melts away each summer, the snow builds up year after year after year. As fresh snow piles on top, the layers beneath are pressed together, and over many decades the trapped snow is slowly compacted into dense, solid ice. It can take a very long time indeed: the ice at the bottom of a large glacier may be thousands of years old.",
+      C:"As it creeps downhill, a glacier acts rather like a giant sheet of sandpaper. Rocks frozen into its underside scrape and gouge the ground below, carving out valleys, grinding whole boulders to powder, and dumping great heaps of rubble wherever the ice finally melts. Much of the world's most dramatic mountain scenery — deep U-shaped valleys, sharp jagged peaks, long ribbon lakes — was shaped by glaciers that vanished long ago.",
+      D:"For hundreds of millions of people, glaciers are not distant curiosities but a vital source of water. High mountain glaciers store snow through the winter and then release it slowly as meltwater through the dry summer months, feeding the rivers on which cities and farms downstream depend. In this way a glacier acts rather like a natural water tower, smoothing out the supply of water across the seasons.",
+      E:"Glaciers are also a remarkable record of the past. As each year's snow is buried, it traps tiny bubbles of air and specks of dust, sealing away a sample of the atmosphere at the very moment it fell. By drilling out long cores of ice and carefully reading these layers, scientists can reconstruct the climate of hundreds of thousands of years ago, learning how temperatures and gases have changed over enormous spans of time.",
+      F:"Around the world, however, glaciers are now shrinking. As the climate warms, more ice melts in summer than snow can replace in winter, and countless glaciers are retreating up their valleys or disappearing altogether. Photographs taken a century apart show once-mighty rivers of ice reduced to mere fragments, and some glaciers that people had known for generations have already gone completely.",
+      G:"The loss of glaciers matters far beyond the mountains themselves. As they vanish, the natural water towers they once provided will fail, threatening the supply of the billions who rely on glacier-fed rivers, while the meltwater released adds to already rising seas. Protecting what remains has become one more urgent reason to slow the warming of the whole planet."
+    },
+    answers:{A:"iii",B:"v",C:"i",D:"vi",E:"ii",F:"vii",G:"iv"},
+    explanations:{
+      A:"给冰川下定义：一条在自重下缓慢流动的「冰河」。",
+      B:"冰川由积雪历经数十年压实而成。",
+      C:"流动的冰如何雕刻地貌（U 形谷、尖峰、带状湖）。",
+      D:"冰川像「天然水塔」，为数亿人跨季节供水。",
+      E:"冰层是古气候的「档案」，可重建几十万年前的气候。",
+      F:"暖化下冰川正在退缩、消失。",
+      G:"冰川消融为何威胁到所有人（断水、海平面上升）。"
+    },
+    distractors:{
+      viii:"「攀登冰川的安全须知」是操作指南，文中并未涉及。",
+      ix:"「雪为何是白的」——文中反复提到雪，却从未讨论雪的颜色，属细节误导。"
+    }
+  },
+  stage3:{
+    time:660,
+    title:"Nature's Wonder Material: Spider Silk",
+    sections:{
+      A:"Spider silk is one of the most remarkable materials in the entire natural world. Weight for weight, some spider silk is stronger than steel and tougher than the fibres used in bulletproof vests, and yet it is so fine that a single strand is almost invisible to the eye. It is also astonishingly stretchy, able to absorb the full energy of a flying insect without ever snapping. Engineers have long dreamed of making something even remotely similar.",
+      B:"A spider produces its silk as a liquid protein inside its own body, stored in special glands. When the spider draws this liquid out through tiny nozzles, called spinnerets, the pulling and a change in acidity transform it, almost instantly, from a watery fluid into a solid thread. Remarkably, all of this happens at ordinary temperatures and using only water, with none of the fierce heat or harsh chemicals that a human factory would need.",
+      C:"A single spider can make several quite different kinds of silk, each suited to a particular job. A garden spider spins a strong, dry line for the spokes of its web and for the safety thread it trails behind it, but a stretchy, sticky silk for the spiral that actually catches its prey. Some silks are made for wrapping eggs, and others for wrapping captured insects, each with its own precise recipe of proteins.",
+      D:"Webs are only the most familiar use of all. Spiders abseil on silk to escape sudden danger, line their burrows with it, and wrap their eggs in protective cases. The young spiders of many species even use silk to fly: they release a fine thread that catches the breeze and carries them, sometimes for hundreds of kilometres, off to new territory — a curious process known as 'ballooning'.",
+      E:"Given all its qualities, people have tried for well over a century to harvest or copy spider silk. Farming spiders for their silk, as we farm silkworms, has proved almost impossible, because spiders are aggressive and will simply eat one another if they are kept too close together. Producing the silk artificially is extremely difficult too: scientists can make the proteins, but faithfully reproducing the exact spinning process that gives the silk its strength has defeated them for decades.",
+      F:"Recently, though, there has been real progress. Researchers have inserted spider genes into other organisms — bacteria, yeast, even goats whose milk then contains silk proteins — and have begun to spin usable fibres from the results. The threads are not yet quite as good as the genuine article, but they are steadily improving, and small quantities are already being produced.",
+      G:"If spider silk could one day be made cheaply and in bulk, the possible uses would be vast. Because it is strong, light and, crucially, not rejected by the human body, it could be used for surgical stitches, artificial ligaments, and scaffolds on which to grow new tissue, as well as for lightweight ropes, protective clothing and countless other products. A material perfected by evolution may yet find a home in hospitals and factories alike."
+    },
+    statements:[
+      {text:"a reason why spiders are so difficult to farm for their silk",answer:"E",explain:"E 段：蜘蛛好斗、关在一起会自相残杀，故难以像蚕那样养殖。"},
+      {text:"a comparison of spider silk's strength with a man-made material",answer:"A",explain:"A 段：等重下某些蛛丝比钢更强、比防弹纤维更韧。"},
+      {text:"possible uses of spider silk in medicine",answer:"G",explain:"G 段：可用作手术缝线、人工韧带、组织生长支架等。"},
+      {text:"an explanation of how a liquid is turned into a solid thread",answer:"B",explain:"B 段：液态蛋白经喷丝头拉出、酸度改变，瞬间变成固体丝。"},
+      {text:"mention of spider silk's ability to stretch and absorb impact",answer:"A",explain:"A 段（再次）：蛛丝极富弹性，能吸收飞虫的能量而不断（与第 2 题同段的不同信息）。"},
+      {text:"an example of spiders using silk to travel long distances",answer:"D",explain:"D 段：幼蛛放出丝线随风飘行（ballooning），可达数百公里。"}
+    ],
+    usedNote:"A 段被用了两次；C、F 段没有用到——与真实考试「部分可重复、部分用不到」一致。"
+  },
+  stage4:{
+    time:840,
+    title:"The Clockmaker Who Solved the Longitude Problem",
+    segments:[
+      {t:"text",c:"For centuries, sailors could find their way north and south with relative ease but were left dangerously lost when it came to east and west. Knowing one's latitude was fairly simple, but there was no reliable way at all to know one's longitude — how far east or west a ship had actually travelled — and this failure cost countless lives and ships."},
+      {t:"gap",n:1},
+      {t:"text",c:"The problem was so serious that in 1714 the British government offered an enormous cash prize to anyone who could solve it. Some of the greatest scientists of the age were convinced that the answer lay in the stars, and they set about mapping the heavens in the hope of turning the night sky into a giant, reliable clock."},
+      {t:"gap",n:2},
+      {t:"text",c:"There was, however, another way entirely. If a sailor could somehow carry the exact time of a fixed place — say, London — and compare it with the local time out at sea, the difference between the two would reveal the longitude. The idea itself was simple; the real difficulty was practical. No clock then existed that could keep accurate time on a rolling, damp, temperature-changing ship."},
+      {t:"gap",n:3},
+      {t:"text",c:"Into this problem stepped a most unlikely figure: John Harrison, a self-taught carpenter and clockmaker from the north of England. Where the great scientists all looked to the sky, Harrison was quietly convinced that the answer was a machine, and he devoted his whole life to building a clock that could keep near-perfect time anywhere on Earth."},
+      {t:"gap",n:4},
+      {t:"text",c:"It took him decades. Harrison built one intricate machine after another, each better than the last, solving problems that had defeated everyone before him — springs that ignored changes in temperature, parts that needed no oiling, mechanisms that cancelled out the endless motion of the waves. His masterpiece, finished after years of patient work, was a beautiful device no larger than a large pocket watch."},
+      {t:"gap",n:5},
+      {t:"text",c:"Yet Harrison struggled for years to claim his reward. The prize was judged by a committee dominated by astronomers, who naturally favoured their own star-based method and were reluctant to admit that a mere working man's clock had beaten them. They set new test after new test and withheld the money, and Harrison was only paid in full after the king himself finally intervened on his behalf."},
+      {t:"gap",n:6},
+      {t:"text",c:"In the end, Harrison's clocks won. Accurate timekeepers, copied and steadily improved, went to sea right across the world, and countless sailors owed their safe arrival to a stubborn carpenter who had simply refused to believe the problem was too hard. The stars, in the long race to measure longitude, had been beaten by a machine."}
+    ],
+    options:{
+      A:"Most experts of the day thought such a clock was simply impossible. Heat and cold made metal parts expand and shrink, salt air corroded them, and the endless rocking of a ship threw off even the very finest mechanisms then known.",
+      B:"He was by now an old man, and recognition had come to him late and grudgingly. But the machine he had spent an entire lifetime perfecting was about to change navigation forever.",
+      C:"Longitude is measured in degrees east or west of an imaginary line running from the North Pole to the South Pole through Greenwich, in London. Each hour of time difference corresponds to exactly fifteen degrees of longitude.",
+      D:"Ships that misjudged their position ran straight onto rocks, missed their destinations entirely, or wandered the open ocean until their crews began to starve. Solving the mystery of longitude became one of the great scientific challenges of the entire age.",
+      E:"When it was at last tested on a long voyage to the Caribbean, it performed astonishingly well, losing only a few seconds over many weeks at sea. By any fair measure, Harrison had done exactly what the prize demanded of him.",
+      F:"For all the sheer brilliance of this effort, it was slow, complex and genuinely difficult to use on a heaving deck. A sea captain was no astronomer, and the necessary calculations could take hours to complete.",
+      G:"He was, in the eyes of the learned gentlemen of London, a mere outsider with no formal training and no business meddling in such lofty matters. But Harrison had a gift for machines that not one of them could match."
+    },
+    answers:{1:"D",2:"F",3:"A",4:"G",5:"E",6:"B"},
+    unused:"C",
+    explanations:{
+      1:"承接「cost countless lives and ships」——D 段具体描述船只触礁、迷航、船员饿死，并点出这成为时代难题；下文讲政府设奖。",
+      2:"上文科学家寄望于星空、绘制星图——F 段指出这套星象法缓慢复杂、在颠簸甲板上难用；下文「另有一法」转折。",
+      3:"上文「没有钟能在海上走准」——A 段说多数专家认为这种钟根本不可能（热胀冷缩、腐蚀、摇晃）；下文哈里森登场。",
+      4:"上文哈里森是自学木匠、坚信靠机器——G 段说他在伦敦学界眼中是「外行」，却有无人能及的机械天赋。",
+      5:"上文杰作完成、只有怀表大小——E 段讲它在远航加勒比的测试中几周只差几秒，完全达到奖赏要求。",
+      6:"上文国王介入、终获全额奖金——B 段说他已年迈、认可来得又晚又勉强，但其毕生之作将永远改变航海；下文点题。",
+      unused:"C（经度以经过格林尼治的经线为基准、每小时对应 15 度…）只是技术性定义，无法衔接任何一个空缺的叙事发展。"
+    }
+  }
+}
+];
+
+const STAGE_KEYS = ["stage1","stage2","stage3","stage4"];
+const STAGE_NAMES = {
+  stage1:"Stage 1 · Short Paragraphs（短段落）",
+  stage2:"Stage 2 · Matching Headings（段落配标题）",
+  stage3:"Stage 3 · Locating Information（信息定位）",
+  stage4:"Stage 4 · Gapped Text（段落填空）"
+};
+
+/* ==================== 状态 ==================== */
+let testIndex=0, stageIdx=0;
+let timerInterval=null, secondsLeft=0;
+let responses={};
+const $=id=>document.getElementById(id);
+const app=()=>$("app");
+
+/* ==================== 计时 ==================== */
+function startTimer(seconds,onEnd){
+  clearInterval(timerInterval);
+  secondsLeft=seconds; renderTimer();
+  $("timer").classList.remove("hidden");
+  timerInterval=setInterval(()=>{
+    secondsLeft--; renderTimer();
+    if(secondsLeft<=0){clearInterval(timerInterval); onEnd();}
+  },1000);
+}
+function renderTimer(){
+  const m=Math.floor(secondsLeft/60), s=secondsLeft%60;
+  const el=$("timer");
+  el.textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  el.classList.toggle("warning",secondsLeft<=60&&secondsLeft>15);
+  el.classList.toggle("danger",secondsLeft<=15);
+}
+function stopTimer(){clearInterval(timerInterval);$("timer").classList.add("hidden");}
+
+/* ==================== 进度点 ==================== */
+function renderProgress(){
+  const sp=$("stageProgress");
+  sp.classList.remove("hidden");
+  sp.innerHTML=[1,2,3,4].map((n,i)=>{
+    let cls="dot"; if(i<stageIdx)cls+=" done"; if(i===stageIdx)cls+=" active";
+    return `<div class="${cls}">${i<stageIdx?"✓":n}</div>`;
+  }).join("");
+}
+
+/* ==================== 首页 ==================== */
+function renderHome(){
+  stopTimer();
+  $("stageProgress").classList.add("hidden");
+  $("tbTitle").textContent="BE10 Reading Test — 完整模拟考";
+  $("tbSub").textContent="选择一套试卷开始";
+  let cards=TESTS.map((t,i)=>`
+    <div class="test-card" onclick="startTest(${i})">
+      <h3>${t.name}</h3>
+      <div class="muted" style="font-size:13px">${t.topics}</div>
+      <ul>
+        <li>Stage 1 短段落 · 8 题 · 16 分钟</li>
+        <li>Stage 2 段落配标题 · 7 题 · 8 分钟</li>
+        <li>Stage 3 信息定位 · 6 题 · 11 分钟</li>
+        <li>Stage 4 段落填空 · 6 题 · 14 分钟</li>
+      </ul>
+      <p style="margin:14px 0 0"><button class="primary" style="width:100%">开始 ▶</button></p>
+    </div>`).join("");
+  app().innerHTML=`
+    <div class="card">
+      <h1>BE10 Reading 完整模拟考</h1>
+      <p class="muted">三套试卷，每套都是完整的四阶段考试，按官方计时依次进行；全程可用鼠标选中文字 🖍 高亮。</p>
+      <div style="background:#faf8fd;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px">
+        <b style="color:var(--purple)">考试流程</b>：Stage 1 → 2 → 3 → 4 依次进行，每部分独立倒计时；时间到或点「提交本部分」即进入下一部分。四部分全部完成后给出总分与逐题解析。共 <b>27 题</b>（Stage 1 有 8 题，每题约 2 分钟）。
+      </div>
+      <div class="test-cards">${cards}</div>
+    </div>`;
+}
+
+function startTest(i){
+  testIndex=i; stageIdx=0; responses={};
+  $("tbTitle").textContent=TESTS[i].name;
+  runStage();
+}
+
+/* ==================== 运行某一 Stage ==================== */
+function runStage(){
+  const key=STAGE_KEYS[stageIdx];
+  renderProgress();
+  $("tbSub").textContent=STAGE_NAMES[key];
+  const st=TESTS[testIndex][key];
+  if(key==="stage1")renderStage1(st);
+  else if(key==="stage2")renderStage2(st);
+  else if(key==="stage3")renderStage3(st);
+  else renderStage4(st);
+  startTimer(st.time,()=>submitStage(true));
+  window.scrollTo(0,0);
+}
+
+function nextBtn(){
+  return `<div class="card center">
+    <button class="primary" onclick="submitStage(false)">提交本部分并继续 ✓</button>
+    <div class="muted" style="margin-top:8px">未作答的题会记为错。时间到会自动提交。</div>
+  </div>`;
+}
+
+/* ---------- Stage 1 ---------- */
+function renderStage1(st){
+  let qs=st.questions.map((q,idx)=>{
+    const opts=Object.entries(q.options).map(([k,v])=>`
+      <label class="opt" data-q="${idx}" data-v="${k}">
+        <input type="radio" name="s1q${idx}" value="${k}" onchange="selOpt(${idx},'${k}')">
+        <b>${k}.</b> ${v}
+      </label>`).join("");
+    return `<div class="q-block">
+      <div class="q-stem"><span class="q-num">Question ${idx+1}.</span> ${q.q}</div>
+      <p class="para">${q.para}</p>
+      ${opts}
+    </div>`;
+  }).join("");
+  app().innerHTML=`
+    <div class="card">
+      <h2>${STAGE_NAMES.stage1}</h2>
+      <p class="muted">阅读每个独立的短段落，选出最能回答问题的一项。共 8 题，每题约 2 分钟（本部分共 16 分钟）。</p>
+      <p class="hl-tip">🖍 可选中文字高亮关键词。</p>
+    </div>
+    <div class="card highlightable">${qs}</div>
+    ${nextBtn()}`;
+}
+function selOpt(idx,k){
+  document.querySelectorAll(`.opt[data-q="${idx}"]`).forEach(o=>o.classList.toggle("sel",o.dataset.v===k));
+}
+
+/* ---------- Stage 2 ---------- */
+function headingsListHTML(headings){
+  return '<ul class="headings-list">'+Object.entries(headings).map(([k,v])=>
+    `<li><span class="num">${k}.</span><span>${v}</span></li>`).join("")+'</ul>';
+}
+function renderStage2(st){
+  const passage=Object.entries(st.sections).map(([l,t])=>
+    `<div class="section-block"><span class="section-letter">${l}.</span>${t}</div>`).join("");
+  const rows=Object.keys(st.sections).map(l=>`
+    <div class="answer-row">
+      <label>Section ${l}</label>
+      <select data-sec="${l}" onchange="checkDupSelect('#s2rows','sec')">
+        <option value="">— 选择 —</option>
+        ${Object.keys(st.headings).map(k=>`<option value="${k}">${k}. ${short(st.headings[k])}</option>`).join("")}
+      </select>
+    </div>`).join("");
+  app().innerHTML=`
+    <div class="card">
+      <h2>${STAGE_NAMES.stage2}</h2>
+      <p class="muted">文章有 7 个段落 A–G。从 9 个标题中为每段选出最合适的一个，有 2 个标题不会用到。</p>
+      <p class="hl-tip">🖍 可选中文字高亮关键词。</p>
+    </div>
+    <div class="grid2">
+      <div class="card passage highlightable">
+        <h2 style="font-size:20px">${st.title}</h2>${passage}
+      </div>
+      <div>
+        <div class="card side">
+          <h2>你的答案</h2>
+          <div id="s2rows">${rows}</div>
+          <div class="dup-warn hidden" id="s2dup">⚠️ 有标题被重复使用（每个标题只能用一次）</div>
+          <div class="card" style="padding:12px 14px;margin:14px 0 0;background:#faf8fd;box-shadow:none">
+            <b style="color:var(--purple)">List of Headings</b>
+            <div class="highlightable" style="font-size:13px;margin-top:6px">${headingsListHTML(st.headings)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${nextBtn()}`;
+}
+function short(s){return s.length>32?s.slice(0,32)+"…":s;}
+
+/* ---------- Stage 3 ---------- */
+function renderStage3(st){
+  const letters=Object.keys(st.sections);
+  const passage=Object.entries(st.sections).map(([l,t])=>
+    `<div class="section-block"><span class="section-letter">${l}.</span>${t}</div>`).join("");
+  const stmts=st.statements.map((s,i)=>`
+    <div class="stmt">
+      <select data-st="${i}">
+        <option value="">?</option>
+        ${letters.map(l=>`<option value="${l}">${l}</option>`).join("")}
+      </select>
+      <div class="highlightable"><b>${i+1}.</b> ${s.text}</div>
+    </div>`).join("");
+  app().innerHTML=`
+    <div class="card">
+      <h2>${STAGE_NAMES.stage3}</h2>
+      <p class="muted">文章分 7 个部分 A–G。判断下列信息各出现在哪个部分。<b>同一字母可重复使用，也有部分用不到</b>。共 6 题。</p>
+      <p class="hl-tip">🖍 文章和下面的信息句都可以选中高亮关键词。</p>
+    </div>
+    <div class="grid2">
+      <div class="card passage highlightable">
+        <h2 style="font-size:20px">${st.title}</h2>${passage}
+      </div>
+      <div>
+        <div class="card side">
+          <h2>信息定位</h2>
+          <p class="muted" style="margin-top:0">选择包含该信息的部分：</p>
+          ${stmts}
+        </div>
+      </div>
+    </div>
+    ${nextBtn()}`;
+}
+
+/* ---------- Stage 4 ---------- */
+function renderStage4(st){
+  const letters=Object.keys(st.options);
+  const body=st.segments.map(seg=>{
+    if(seg.t==="text")return `<p class="para">${seg.c}</p>`;
+    return `<div class="gap-slot">
+      <label>Gap ${seg.n}</label>
+      <select data-gap="${seg.n}" onchange="checkDupSelect('#s4body','gap')">
+        <option value="">— 选择段落 —</option>
+        ${letters.map(l=>`<option value="${l}">${l}</option>`).join("")}
+      </select>
+    </div>`;
+  }).join("");
+  const opts=Object.entries(st.options).map(([l,t])=>
+    `<li><span class="ol">${l}</span>${t}</li>`).join("");
+  app().innerHTML=`
+    <div class="card">
+      <h2>${STAGE_NAMES.stage4}</h2>
+      <p class="muted">文章中抽走了 6 个段落。从 A–G 中为每个空缺选择最合适的段落，有 1 个段落不会用到。</p>
+      <p class="hl-tip">🖍 可选中文字高亮衔接线索（连接词、指代词、重复的关键词）。</p>
+    </div>
+    <div class="grid2">
+      <div class="card highlightable" id="s4body">
+        <h2 style="font-size:20px">${st.title}</h2>${body}
+      </div>
+      <div>
+        <div class="card side">
+          <h2>可选段落</h2>
+          <div class="dup-warn hidden" id="s4dup">⚠️ 有段落被重复使用（每个段落只能填一个空）</div>
+          <ul class="opt-list highlightable">${opts}</ul>
+        </div>
+      </div>
+    </div>
+    ${nextBtn()}`;
+}
+
+/* 重复选择检测（用于 stage2 与 stage4） */
+function checkDupSelect(scope,attr){
+  const sels=document.querySelectorAll(`${scope} select`);
+  const counts={};
+  sels.forEach(s=>{if(s.value)counts[s.value]=(counts[s.value]||0)+1;});
+  let dup=false;
+  sels.forEach(s=>{const d=s.value&&counts[s.value]>1;s.classList.toggle("dup",d);if(d)dup=true;});
+  const warn=scope==="#s4body"?$("s4dup"):$("s2dup");
+  if(warn)warn.classList.toggle("hidden",!dup);
+}
+
+/* ==================== 收集答案并推进 ==================== */
+function collectStage(){
+  const key=STAGE_KEYS[stageIdx];
+  const st=TESTS[testIndex][key];
+  if(key==="stage1"){
+    const a={};
+    st.questions.forEach((q,i)=>{const c=document.querySelector(`input[name="s1q${i}"]:checked`);a[i]=c?c.value:"";});
+    responses.stage1=a;
+  }else if(key==="stage2"){
+    const a={};
+    document.querySelectorAll('#s2rows select').forEach(s=>a[s.dataset.sec]=s.value);
+    responses.stage2=a;
+  }else if(key==="stage3"){
+    const a={};
+    document.querySelectorAll('.stmt select').forEach(s=>a[s.dataset.st]=s.value);
+    responses.stage3=a;
+  }else{
+    const a={};
+    document.querySelectorAll('#s4body select').forEach(s=>a[s.dataset.gap]=s.value);
+    responses.stage4=a;
+  }
+}
+function submitStage(auto){
+  collectStage();
+  stageIdx++;
+  if(stageIdx<4){ runStage(); }
+  else { stopTimer(); renderResults(); }
+}
+
+/* ==================== 结果 ==================== */
+function gradeStage1(st){
+  let c=0; st.questions.forEach((q,i)=>{if((responses.stage1[i]||"")===q.answer)c++;});
+  return c;
+}
+function gradeMap(answers,resp){
+  let c=0; for(const k in answers){if((resp[k]||"")===answers[k])c++;} return c;
+}
+function renderResults(){
+  const T=TESTS[testIndex];
+  $("stageProgress").classList.add("hidden");
+  $("tbSub").textContent="已完成 · 查看结果";
+  const s1=gradeStage1(T.stage1);
+  const s2=gradeMap(T.stage2.answers,responses.stage2);
+  let s3=0; T.stage3.statements.forEach((s,i)=>{if((responses.stage3[i]||"")===s.answer)s3++;});
+  const s4=gradeMap(T.stage4.answers,responses.stage4);
+  const total=s1+s2+s3+s4;
+
+  let t1=T.stage1.questions.map((q,i)=>{
+    const y=responses.stage1[i]||"—", ok=y===q.answer;
+    return `<tr><td class="center"><b>${i+1}</b></td>
+      <td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${q.answer}</b></td>
+      <td>${q.explain}</td></tr>`;
+  }).join("");
+
+  let t2=Object.keys(T.stage2.sections).map(l=>{
+    const y=responses.stage2[l]||"—", corr=T.stage2.answers[l], ok=y===corr;
+    return `<tr><td class="center"><b>${l}</b></td>
+      <td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${corr}</b>. ${short(T.stage2.headings[corr])}</td>
+      <td>${T.stage2.explanations[l]}</td></tr>`;
+  }).join("");
+  let d2=Object.entries(T.stage2.distractors).map(([k,v])=>`<p><b style="color:var(--purple)">${k}.</b> ${T.stage2.headings[k]} — ${v}</p>`).join("");
+
+  let t3=T.stage3.statements.map((s,i)=>{
+    const y=responses.stage3[i]||"—", ok=y===s.answer;
+    return `<tr><td class="center"><b>${i+1}</b></td>
+      <td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${s.answer}</b></td>
+      <td>${s.text}<br><span class="muted">${s.explain}</span></td></tr>`;
+  }).join("");
+
+  let t4=Object.keys(T.stage4.answers).map(n=>{
+    const y=responses.stage4[n]||"—", corr=T.stage4.answers[n], ok=y===corr;
+    return `<tr><td class="center"><b>Gap ${n}</b></td>
+      <td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${corr}</b></td>
+      <td>${T.stage4.explanations[n]}</td></tr>`;
+  }).join("");
+
+  app().innerHTML=`
+    <div class="card">
+      <h1 style="text-align:center">${T.name} · 成绩</h1>
+      <div class="score-big">${total} / 27</div>
+      <div class="stage-scores">
+        <div class="ss"><b>${s1}/8</b><span>Stage 1</span></div>
+        <div class="ss"><b>${s2}/7</b><span>Stage 2</span></div>
+        <div class="ss"><b>${s3}/6</b><span>Stage 3</span></div>
+        <div class="ss"><b>${s4}/6</b><span>Stage 4</span></div>
+      </div>
+      <p class="center" style="margin-top:18px">
+        <button class="primary" onclick="startTest(${testIndex})">重做本套 ↺</button>
+        <button class="ghost" onclick="renderHome()" style="margin-left:10px">返回选卷</button>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Stage 1 · Short Paragraphs</h2>
+      <table class="results"><thead><tr><th>题号</th><th>你的答案</th><th>正确</th><th>解析</th></tr></thead><tbody>${t1}</tbody></table>
+    </div>
+
+    <div class="card">
+      <h2>Stage 2 · Matching Headings</h2>
+      <p class="muted">${T.stage2.title}</p>
+      <table class="results"><thead><tr><th>段落</th><th>你的答案</th><th>正确标题</th><th>解析</th></tr></thead><tbody>${t2}</tbody></table>
+      <h3>两个干扰标题为什么错</h3>${d2}
+    </div>
+
+    <div class="card">
+      <h2>Stage 3 · Locating Information</h2>
+      <p class="muted">${T.stage3.title}</p>
+      <table class="results"><thead><tr><th>题号</th><th>你的答案</th><th>正确</th><th>信息 / 解析</th></tr></thead><tbody>${t3}</tbody></table>
+      <p class="muted" style="margin-top:8px">${T.stage3.usedNote||""}</p>
+    </div>
+
+    <div class="card">
+      <h2>Stage 4 · Gapped Text</h2>
+      <p class="muted">${T.stage4.title}（未使用的段落：<b>${T.stage4.unused}</b>）</p>
+      <table class="results"><thead><tr><th>空缺</th><th>你的答案</th><th>正确</th><th>衔接解析</th></tr></thead><tbody>${t4}</tbody></table>
+      <p class="muted" style="margin-top:8px">${T.stage4.explanations.unused}</p>
+    </div>`;
+  window.scrollTo(0,0);
+}
+
+/* ==================== 高亮 ==================== */
+const hlBtn=$("hlBtn"); let savedRange=null;
+document.addEventListener("mouseup",e=>{
+  if(e.target===hlBtn)return;
+  setTimeout(()=>{
+    const sel=window.getSelection();
+    if(!sel||sel.isCollapsed||!sel.rangeCount){hlBtn.classList.add("hidden");return;}
+    const range=sel.getRangeAt(0);
+    const cont=range.commonAncestorContainer;
+    const el=cont.nodeType===3?cont.parentElement:cont;
+    if(!el||!el.closest(".highlightable")){hlBtn.classList.add("hidden");return;}
+    savedRange=range.cloneRange();
+    const r=range.getBoundingClientRect();
+    hlBtn.style.top=(window.scrollY+r.top-38)+"px";
+    hlBtn.style.left=(window.scrollX+r.left+r.width/2-34)+"px";
+    hlBtn.classList.remove("hidden");
+  },10);
+});
+hlBtn.addEventListener("click",()=>{
+  if(savedRange)highlightRange(savedRange);
+  hlBtn.classList.add("hidden");
+  window.getSelection().removeAllRanges(); savedRange=null;
+});
+document.addEventListener("click",e=>{
+  const mark=e.target.closest("mark.hl");
+  if(mark&&(!window.getSelection()||window.getSelection().isCollapsed)){
+    const p=mark.parentNode;
+    while(mark.firstChild)p.insertBefore(mark.firstChild,mark);
+    p.removeChild(mark); p.normalize();
+  }
+});
+function highlightRange(range){
+  if(range.collapsed)return;
+  const root=range.commonAncestorContainer.nodeType===3?range.commonAncestorContainer.parentElement:range.commonAncestorContainer;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+    acceptNode(node){
+      if(!range.intersectsNode(node))return NodeFilter.FILTER_REJECT;
+      if(node.parentElement.closest("mark.hl"))return NodeFilter.FILTER_REJECT;
+      if(!node.parentElement.closest(".highlightable"))return NodeFilter.FILTER_REJECT;
+      if(!node.textContent.trim())return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const node of nodes){
+    let start=0,end=node.textContent.length;
+    if(node===range.startContainer)start=range.startOffset;
+    if(node===range.endContainer)end=range.endOffset;
+    if(start>=end)continue;
+    const middle=start>0?node.splitText(start):node;
+    if(end-start<middle.textContent.length)middle.splitText(end-start);
+    const mark=document.createElement("mark"); mark.className="hl";
+    middle.parentNode.insertBefore(mark,middle); mark.appendChild(middle);
+  }
+}
+
+/* ==================== 启动 ==================== */
+renderHome();
+</script>
+</body>
+</html>
