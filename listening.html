@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BE10 Listening Test — 完整模拟考</title>
+<style>
+  :root{
+    --purple:#51247a; --purple-light:#962a8b; --bg:#f6f4f9; --card:#fff;
+    --text:#2b2b2b; --muted:#6b6b7b; --green:#1e7d45; --red:#c0392b;
+    --amber:#b45309; --hl:#ffe066; --line:#e4dff0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.65;}
+  .topbar{position:sticky;top:0;z-index:50;background:var(--purple);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:9px 20px;box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  .topbar .t1{font-weight:700;font-size:14.5px;}
+  .topbar .t2{font-size:12.5px;opacity:.85;}
+  .timer{font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;
+    background:rgba(255,255,255,.14);padding:2px 14px;border-radius:8px;min-width:96px;text-align:center;}
+  .container{max-width:1000px;margin:0 auto;padding:22px 18px 90px;}
+  .card{background:var(--card);border-radius:12px;padding:22px 26px;margin-bottom:18px;
+    box-shadow:0 1px 4px rgba(60,40,90,.08);}
+  h1{color:var(--purple);font-size:23px;margin:0 0 6px;}
+  h2{color:var(--purple);font-size:19px;margin:0 0 12px;}
+  h3{font-size:16px;margin:18px 0 8px;color:var(--purple-light);}
+  .muted{color:var(--muted);font-size:14px;}
+  .hidden{display:none!important;}
+  button.primary{background:var(--purple);color:#fff;border:none;padding:12px 30px;
+    font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;}
+  button.primary:hover{background:var(--purple-light);}
+  button.ghost{background:transparent;color:var(--purple);border:1.5px solid var(--purple);
+    padding:9px 20px;font-size:14.5px;border-radius:8px;cursor:pointer;}
+  button.ghost:hover{background:#f0eaf7;}
+  .test-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:680px){.test-cards{grid-template-columns:1fr;}}
+  .test-card{border:1.5px solid var(--line);border-radius:12px;padding:20px;cursor:pointer;transition:.15s;}
+  .test-card:hover{border-color:var(--purple);box-shadow:0 4px 14px rgba(81,36,122,.14);transform:translateY(-2px);}
+  .test-card h3{margin:0 0 8px;color:var(--purple);font-size:18px;}
+  .test-card ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted);}
+  .stage-progress{display:flex;gap:6px;align-items:center;}
+  .dot{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.22);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .dot.active{background:#fff;color:var(--purple);}
+  .dot.done{background:#8f6db3;}
+  /* audio player */
+  .audio-box{background:linear-gradient(135deg,#5a2a86,#8a3fa0);color:#fff;border-radius:12px;
+    padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .audio-box .ai{font-size:26px;}
+  .audio-box .info{flex:1;min-width:180px;font-size:13.5px;opacity:.95;}
+  .play-btn{background:#fff;color:var(--purple);border:none;padding:11px 24px;font-size:15px;
+    font-weight:700;border-radius:30px;cursor:pointer;white-space:nowrap;}
+  .play-btn:disabled{opacity:.7;cursor:default;}
+  /* questions */
+  .q-block{padding:16px 0;border-bottom:1px solid var(--line);}
+  .q-block:last-child{border-bottom:none;}
+  .q-num{font-weight:700;color:var(--purple);}
+  .q-ctx{font-style:italic;color:var(--muted);margin:2px 0 4px;}
+  .q-stem{font-weight:600;margin:0 0 10px;}
+  .opt{display:block;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;margin-bottom:7px;cursor:pointer;}
+  .opt:hover{border-color:var(--purple-light);background:#faf7fd;}
+  .opt input{margin-right:9px;}
+  .opt.sel{border-color:var(--purple);background:#f3ecfa;}
+  .grid2{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+  .box-list{list-style:none;padding:0;margin:0;}
+  .box-list li{padding:6px 10px;border-radius:6px;margin-bottom:2px;font-size:14px;}
+  .box-list li:nth-child(odd){background:#faf8fd;}
+  .box-list b{color:var(--purple);}
+  .match-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .match-row label{flex:1;font-size:14.5px;}
+  .match-row select{padding:6px 9px;font-size:14px;border:1.5px solid #ccc;border-radius:6px;background:#fff;min-width:70px;}
+  .match-row select.dup{border-color:var(--amber);background:#fff7ea;}
+  .dup-warn{color:var(--amber);font-size:13px;margin-top:4px;}
+  .opt4{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+  .opt4 label{border:1.5px solid #ddd;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13.5px;}
+  .opt4 label:hover{border-color:var(--purple-light);background:#faf7fd;}
+  .opt4 label.sel{border-color:var(--purple);background:#f3ecfa;}
+  .opt4 input{margin-right:6px;}
+  .chk{display:block;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;margin-bottom:7px;cursor:pointer;}
+  .chk:hover{border-color:var(--purple-light);background:#faf7fd;}
+  .chk.sel{border-color:var(--purple);background:#f3ecfa;}
+  .chk input{margin-right:9px;}
+  /* highlight */
+  .highlightable{cursor:text;}
+  mark.hl{background:var(--hl);padding:0 1px;border-radius:2px;cursor:pointer;}
+  mark.hl:hover{background:#ffd43b;}
+  #hlBtn{position:absolute;z-index:99;background:#333;color:#fff;border:none;padding:5px 12px;
+    border-radius:6px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+  .hl-tip{font-size:13px;color:var(--muted);margin:6px 0 0;}
+  /* results */
+  .score-big{font-size:48px;font-weight:800;color:var(--purple);text-align:center;line-height:1.1;}
+  .stage-scores{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0;}
+  .ss{background:#f3ecfa;border-radius:10px;padding:8px 16px;text-align:center;min-width:92px;}
+  .ss b{display:block;color:var(--purple);font-size:20px;}
+  .ss span{font-size:12.5px;color:var(--muted);}
+  table.results{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px;}
+  table.results th,table.results td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  table.results th{background:#f2edf9;color:var(--purple);}
+  .ok{color:var(--green);font-weight:700;}
+  .bad{color:var(--red);font-weight:700;}
+  .center{text-align:center;}
+  .tr-line{margin:2px 0;font-size:14px;}
+  .tr-line .sp{font-weight:700;color:var(--purple);margin-right:6px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="t1" id="tbTitle">BE10 Listening Test — 完整模拟考</div>
+    <div class="t2" id="tbSub">选择一套试卷开始</div>
+  </div>
+  <div class="stage-progress hidden" id="stageProgress"></div>
+  <div class="timer hidden" id="timer">00:00</div>
+</div>
+
+<button id="hlBtn" class="hidden">🖍 高亮</button>
+
+<div class="container" id="app"></div>
+
+<script>
+/* ============================================================
+   听力题库：LISTEN_TESTS[0]=真题卷, [1]=原创练习卷
+   录音以文字原文(transcript)给出，用浏览器语音朗读，仅播一次。
+   who: N=旁白, M=男, W=女
+   ============================================================ */
+const LISTEN_TESTS = [
+/* ==================== 真题卷 ==================== */
+{
+  name:"Listening Test 1（真题）",
+  topics:"八情景 · 海滨城市演讲 · 湿地开发之争 · 大坝与水安全",
+  stage1:{
+    intro:"你会听到八个情景中的对话或独白。第 1–10 题，从 A、B、C 中选出最佳答案。",
+    transcript:[
+      {who:"N",text:"Stage one. You will hear people talking in eight different situations."},
+      {who:"N",text:"Question one. You overhear two students discussing a reading project they did with young children."},
+      {who:"M",text:"So did you like working with the little kids, reading with them and everything? The books we chose for them from our library went down a storm, didn't they? Especially the bits we read out loud."},
+      {who:"W",text:"Yeah, though I wondered if the really little ones could hear properly - it's such a big space. It was good fun, though."},
+      {who:"M",text:"Like when we started giving away the gifts we'd brought them."},
+      {who:"W",text:"It's a pity the weather wasn't good - we should've been out in the sunshine. That room's meant to hold the whole school - about six hundred kids."},
+      {who:"M",text:"Well, at least we got out to play football with them in the break."},
+      {who:"N",text:"Question two. You hear an office manager talking about her work."},
+      {who:"W",text:"You know how it is, as soon as you've finished one project, you have to get started on something else, and it's often something completely different. I don't find that a problem though, and I enjoy the fact that I can get it done effectively - after all, I've been in this job for a long time so I think I can say I know what I'm doing! I wish that was true of the people I'm working with - I reckon if I didn't keep checking, they'd never get on with things! Though I guess I'm not feeling very motivated about this project either."},
+      {who:"N",text:"Question three. You hear part of a radio programme."},
+      {who:"W",text:"I think lots of people will be interested in finding out more about it. It's a great way of seeing all the plants and trees that thrive in this area, and in spring it's spectacular! Teachers who want to encourage their students to protect the environment should take them - after all there's nothing like experiencing something for yourself to make you value it. We've made sure it's as accessible as possible, and hope it'll be popular with people of all ages. If you want more information, the details are all online. There's no excuse not to get out there and try it!"},
+      {who:"N",text:"Question four. You hear a girl talking about a psychology textbook."},
+      {who:"W",text:"Well I was quite excited when I finally found this psychology book, because I need it for my assignment. It was hardly cheap, and I know I could get a lot of the information in it for free online, but I still think it was worth getting my own copy of it. It has such clear explanations, I probably won't find anything else as useful. Some books like this can turn out to be pretty boring, I know, but I just don't believe this one will. And it's no more expensive than any of the other coursebooks I have to buy."},
+      {who:"N",text:"Question five. You hear two people talking about a country walk they're doing."},
+      {who:"M",text:"Are you feeling tired?"},
+      {who:"W",text:"No, I'm fine, just stopping to look at the scenery. It's beautiful, isn't it?"},
+      {who:"M",text:"Fabulous, but keep moving - it's too cold to stand still."},
+      {who:"W",text:"Well, we knew that when we set off. The forecast's better for tomorrow. I did say we should wait."},
+      {who:"M",text:"Sorry, I know, but let's carry on because there's only another five kilometres to go. Right or left here?"},
+      {who:"W",text:"Left, I think, according to the map. Five kilometres you said? It'll be just about dark when we get to the end."},
+      {who:"M",text:"If we do get there! I'm only joking!"},
+      {who:"N",text:"Question six. You hear a swimmer talking about a competition she took part in."},
+      {who:"W",text:"I had such a good time at the championships, better than I expected. The atmosphere was incredible with everyone cheering. I didn't expect so many people to turn up to the event, though I don't suppose they were there to see me. I hadn't been too happy with my performance in the previous competition, so to turn things round like that was very satisfying. The pressure started to get to me at one point, but I had a talk with myself and got things into perspective. I must work on my nerves before the next big event, but I can't wait to get back in the pool and start training for it."},
+      {who:"N",text:"Question seven. You hear two friends talking about a popular television programme."},
+      {who:"M",text:"Did you watch that programme last night on Channel Two?"},
+      {who:"W",text:"Yeah. It's hard to believe Helen Jenkins is seventy-five years old, isn't it? Most people give up work well before then and she still seems to be on TV all the time!"},
+      {who:"M",text:"I know! I think it's because she's such a good communicator and she's come into her own, hasn't she, with the move away from complicated cuisine towards the simple, budget-friendly family stuff. It's very much in keeping with the times, isn't it?"},
+      {who:"W",text:"Yes, but I still haven't learnt to do it myself."},
+      {who:"N",text:"Question eight. You hear two people talking about a place they have visited."},
+      {who:"W",text:"I loved the architecture, didn't you?"},
+      {who:"M",text:"Yeah, it was so unusual - I mean when you think of what's being put up in cities nowadays, you know, all the shopping centres and places, then you wonder whether anyone actually bothers to design buildings like that anymore."},
+      {who:"W",text:"That's right, and it's just so quiet and peaceful in there - you could really take time to look at all the objects on display. I loved those rare fifteenth-century books! So different from anything you could ever buy."},
+      {who:"M",text:"Yeah, me too. I'm going to read up on those now, in fact. There'll be something about them on the internet, or maybe a book I can borrow."},
+      {who:"N",text:"Question nine. You hear a lecturer talking to some of his students about their history project."},
+      {who:"M",text:"Well the deadline's not for a while yet, so there's plenty of time for you to choose your topic for your nineteenth-century history project and read up on it. There's been a lot written on this period that you'll find useful I'm sure. Books are a great source of information, as well as the internet of course, but check your facts carefully and use reliable websites. Also make sure you come and see me if there's anything that's unclear or you think I can help you with. Straight after a lecture is a good time to catch me. And finally, good luck, everybody!"},
+      {who:"N",text:"Question ten. You hear part of a radio programme in which a teacher is talking about her own education."},
+      {who:"W",text:"I was educated in quite a posh and rather expensive school, really, so expectations for pupils were high, and that put us under pressure a bit. Mind you, I wouldn't have got down to it and done much otherwise, and certainly wouldn't have gone to university. Perhaps that's why I've found my niche in trying to make sure that everyone gets the kind of education that allows them to realise their full potential in life. Teaching wasn't my first career choice, though. I think colleagues I worked with were amazed when I made the switch from industry. But I haven't looked back since I did it."}
+    ],
+    questions:[
+      {ctx:"You overhear two students discussing a reading project they did with young children.",q:"What do they agree about it?",options:{A:"The venue was perfect.",B:"The material was well received.",C:"The number of participants was surprising."},answer:"B",explain:"男生说选的书「went down a storm」（大受欢迎）= material well received。A 场地：女生嫌空间太大、小孩听不清，并非完美；C 只提到房间能容约 600 人，并非「surprising」。"},
+      {ctx:"You hear an office manager talking about her work.",q:"How does she feel about it?",options:{A:"confident that she can do it well",B:"interested in her new project",C:"satisfied with her staff"},answer:"A",explain:"「I know what I'm doing / get it done effectively」= 自信能做好。B 与「not feeling very motivated about this project」相反；C「wish that was true of the people... keep checking」表明对同事并不满意。"},
+      {ctx:"You hear part of a radio programme.",q:"What is the woman talking about?",options:{A:"an environment group",B:"a nature course for school children",C:"a new walking route in the countryside"},answer:"C",explain:"看植物树木、「get out there and try it」、accessible、适合 all ages = 一条乡间步道。A 不是「团体」；B 不只针对学生（for all ages）。"},
+      {ctx:"You hear a girl talking about a psychology textbook.",q:"What does she say about it?",options:{A:"It is not very interesting.",B:"It is good value for money.",C:"It is going to come in useful."},answer:"C",explain:"「need it for my assignment / clear explanations / won't find anything else as useful」= 会很有用。A 与「don't believe this one will [be boring]」相反；B 她说「hardly cheap」，并未强调超值。"},
+      {ctx:"You hear two people talking about a country walk they're doing.",q:"What do they agree about?",options:{A:"It's much too long to complete.",B:"The path is very difficult to follow.",C:"They've chosen the wrong day to do it."},answer:"C",explain:"女：「forecast's better for tomorrow, I did say we should wait」，男：「Sorry, I know」（认同）= 选错了日子。A 只剩 5km，能走完；B 只是随口看地图，非难走。"},
+      {ctx:"You hear a swimmer talking about a competition she took part in.",q:"How does she feel about it?",options:{A:"disappointed with her result",B:"excited about where it will lead",C:"surprised by the support she received"},answer:"B",explain:"「can't wait to get back in the pool and start training for [the next big event]」= 期待接下来的发展。A 结果「very satisfying」非失望；C 观众虽多，但她说「I don't suppose they were there to see me」，并非对她的支持。"},
+      {ctx:"You hear two friends talking about a popular television programme.",q:"What is the programme about?",options:{A:"retirement",B:"cookery",C:"teaching"},answer:"B",explain:"「cuisine / budget-friendly family stuff / haven't learnt to do it myself」= 烹饪。A 退休、C 教学（good communicator）都是干扰。"},
+      {ctx:"You hear two people talking about a place they have visited.",q:"What kind of place is it?",options:{A:"a museum",B:"a library",C:"a shop"},answer:"A",explain:"「objects on display / rare fifteenth-century books / different from anything you could ever buy」= 展品陈列 = 博物馆。B 图书馆、C 商店都是干扰（书 / buy）。"},
+      {ctx:"You hear a lecturer talking to some of his students about their history project.",q:"What is he doing?",options:{A:"encouraging them to ask him questions about it",B:"recommending some books that will help with it",C:"advising them on how to organise their time"},answer:"A",explain:"「come and see me if there's anything unclear / catch me after a lecture」= 鼓励他们来提问。B 未推荐具体书目；C 只说「时间充裕」，并未教如何安排时间。"},
+      {ctx:"You hear part of a radio programme in which a teacher is talking about her own education.",q:"Why did she become a teacher?",options:{A:"She enjoyed her own time at school very much.",B:"She was encouraged to do so by colleagues.",C:"She wanted others to have the same opportunities as her."},answer:"C",explain:"「make sure everyone gets the kind of education that allows them to realise their full potential」= 想让别人拥有和她一样的机会（她上了大学）。A 学校让她「under pressure」，非「很享受」；B 同事是「amazed」而非鼓励。"}
+    ]
+  },
+  stage2:{
+    intro:"你会听到两名城市规划学生讨论关于「海滨城市」的演讲。他们对演讲每个部分做了什么决定？从 A–G 中为 5 个部分各选一个（有 2 个不用）。",
+    transcript:[
+      {who:"N",text:"Stage two. You will hear two urban planning students discussing their presentation on cities built by the sea."},
+      {who:"W",text:"So I think we've probably got enough for our presentation. It's only fifteen minutes."},
+      {who:"M",text:"OK. So I suppose we'll begin with some general historical background about why coastal cities were established. But we don't want to spend too long on that, the other students will already know a bit about it. It's all to do with communications and so on."},
+      {who:"W",text:"Yes. We should mention some geographical factors, things like wetlands and river estuaries and coastal erosion and so on. We could have some maps of different cities with these features marked."},
+      {who:"M",text:"On a handout you mean? Or some slides everyone can see?"},
+      {who:"W",text:"Yeah, that'd be better."},
+      {who:"M",text:"It'd be good to go into past mistakes in a bit more detail. Did you read that case study of the problems there were in New Orleans with flooding a few years ago?"},
+      {who:"W",text:"Yes. We could use that as the basis for that part of the talk. I don't think the other students will have read it, but they'll remember hearing about the flooding at the time."},
+      {who:"M",text:"OK. So that's probably enough background."},
+      {who:"W",text:"So then we'll go on to talk about what action's being taken to deal with the problems of coastal cities."},
+      {who:"M",text:"OK. What else do we need to talk about? Maybe something on future risks, looking more at the long term, if populations continue to grow."},
+      {who:"W",text:"Yeah. We'll need to do a bit of work there, I haven't got much information, have you?"},
+      {who:"M",text:"No. We'll need to look at some websites. Shouldn't take too long."},
+      {who:"W",text:"OK. And I think we should end by talking about international implications. Maybe we could ask people in the audience. We've got people from quite a lot of different places."},
+      {who:"M",text:"That'd be interesting, if we have time, yes."}
+    ],
+    parts:[
+      {n:1,label:"Historical background"},
+      {n:2,label:"Geographical factors"},
+      {n:3,label:"Past mistakes"},
+      {n:4,label:"Future risks"},
+      {n:5,label:"International implications"}
+    ],
+    decisions:{A:"Use visuals",B:"Keep it short",C:"Involve other students",D:"Check the information is accurate",E:"Provide a handout",F:"Focus on one example",G:"Do online research"},
+    answers:{1:"B",2:"A",3:"F",4:"G",5:"C"},
+    explanations:{
+      1:"「we don't want to spend too long on that」= Keep it short (B)。",
+      2:"「maps... slides everyone can see」= Use visuals (A)。",
+      3:"以 New Orleans 洪水案例为基础 = Focus on one example (F)。",
+      4:"「haven't got much information... look at some websites」= Do online research (G)。",
+      5:"「ask people in the audience... from different places」= Involve other students (C)。"
+    },
+    unused:["D","E"],
+    unusedNote:"未用 D（检查信息准确）、E（发讲义——被否决，改用大家都能看的幻灯片）。"
+  },
+  stage3:{
+    intro:"你会听到一男一女讨论一个开发项目是否该进行。判断下面 6 句各符合谁的观点。",
+    transcript:[
+      {who:"N",text:"Stage three. You will hear a man and a woman discussing whether a development project should go ahead."},
+      {who:"M",text:"Hi Kay. Did you see the article in the paper this morning about the proposed wetlands development near the harbour?"},
+      {who:"W",text:"You mean the massive project with high-rise apartments, shops and restaurants to be built on reclaimed land?"},
+      {who:"M",text:"Yeah. It sounds like an exciting development. The area's booming and we're going to have to find solutions for the lack of accommodation in this area."},
+      {who:"W",text:"That's certainly a problem we have to address."},
+      {who:"M",text:"What do you think about the location of the site that's been chosen?"},
+      {who:"W",text:"Well, for starters, with climate change and rising sea levels, building on the shoreline is risky. Flooding in the near future is a real possibility."},
+      {who:"M",text:"I'm sure the developers have considered that and included measures to counteract any climate-related risks."},
+      {who:"W",text:"In the long run, though, it'll be the taxpayers footing the bill for sea walls and flood defences if those measures fall short."},
+      {who:"M",text:"Let's not be too negative. Think of the benefits - upgrades to the ferry terminal, more business for local shops and a boost to tourism."},
+      {who:"W",text:"But a development of this scale will also bring more traffic congestion, and at least a decade of disruptive construction. We can do without all that."},
+      {who:"M",text:"Well, that's the price of progress. You can't have development without some short-term inconvenience."},
+      {who:"W",text:"I read that the wetlands are home to endangered wildlife such as the Eastern Curlew and other migratory birds. Their populations could decline due to habitat loss."},
+      {who:"M",text:"The effects of development won't be as serious as suggested. The development covers only 0.02% of the wetlands so its impact would be fairly minimal."},
+      {who:"W",text:"That's misleading. Part of the area to be reclaimed for the project is used by juvenile curlews that don't really have any other options elsewhere. The percentage is irrelevant if the habitat that's going to be destroyed is a crucial part of the bird's life cycle."},
+      {who:"M",text:"Perhaps the developers could adjust their plans to avoid the most sensitive areas."},
+      {who:"W",text:"My other concern is that the site is actually protected for migratory birds under an international agreement."},
+      {who:"M",text:"I did read somewhere that Australia is a signatory to the Ramsar Convention and is obliged under the agreement to conserve our wetland."},
+      {who:"W",text:"Approving the development would be a clear breach of that agreement."},
+      {who:"M",text:"The developers say they're only using a small proportion of the wetlands but I suppose allowing commercial development here would set a dangerous precedent - what's to stop other protected areas from being exploited?"},
+      {who:"W",text:"Once you open the door, it's much harder to close it again."},
+      {who:"M",text:"Well, ultimately, it's up to the public to decide if they want the development to go ahead."},
+      {who:"W",text:"Not really. The government's the one with the final say but given the environmental concerns, I doubt they'll go ahead with it."},
+      {who:"M",text:"They'll need to balance these concerns with other considerations so it's hard to say which way the government will lean."}
+    ],
+    options4:["the man","the woman","the man and the woman","not the man and not the woman"],
+    statements:[
+      {text:"There is a need to meet the housing needs of people in the area.",answer:2,explain:"男：「find solutions for the lack of accommodation」；女：「certainly a problem we have to address」→ 两人都认同有住房需求。"},
+      {text:"The location of the site is unsuitable for development.",answer:1,explain:"女：「building on the shoreline is risky, flooding a real possibility」；男认为开发商已有应对措施 → 只有女方认为选址不合适。"},
+      {text:"The benefits of the development project outweigh the disadvantages.",answer:0,explain:"男：列举好处、「that's the price of progress」；女：强调交通拥堵、十年施工「we can do without all that」→ 只有男方认为利大于弊。"},
+      {text:"The potential impact on local wildlife is being exaggerated.",answer:0,explain:"男：「won't be as serious as suggested... only 0.02%... minimal」；女：「That's misleading, the percentage is irrelevant」→ 只有男方认为影响被夸大。"},
+      {text:"Violating an international agreement will have serious consequences.",answer:2,explain:"女：「clear breach... once you open the door, harder to close」；男：「dangerous precedent - what's to stop other protected areas being exploited」→ 两人都认为违反协议后果严重。"},
+      {text:"The government is likely to approve the project.",answer:3,explain:"女认为政府「不太可能」批准（I doubt they'll go ahead）；男说「hard to say」→ 没有人认为政府很可能批准 = 两人都不是。"}
+    ]
+  },
+  stage4:{
+    intro:"你会听到一段关于「大坝与水安全」的学生演讲。每题从 A–E 中选出所有正确选项（可能不止一个）。真实考试：录音前有 60 秒看题、结束后有 20 秒检查。",
+    transcript:[
+      {who:"N",text:"Stage four. You will hear part of a student presentation about dams and water security."},
+      {who:"M",text:"For thousands of years, humans have dammed rivers to meet vital needs. But how effectively do dams work today? Dams ensure a regular supply of water, particularly for people in areas with limited access to natural water sources. However, they're not always efficient. In hot arid climates, vast amounts of water are lost, up to 30% in some Australian reservoirs. In agriculture, dams have long been essential. They ensure a consistent supply of water and allow more than one crop a year. Dams create deeper channels, making rivers navigable and allowing for the movement of farm produce and other goods. Dams also help control flooding. They can be quite effective in this regard but extreme rainfall events can force dams to release water, sometimes causing downstream flooding and extensive damage. Modern dams are also engineered to produce hydroelectricity. While dams are generally a reliable renewable energy source, serious disruptions to electricity production can occur in times of prolonged drought, as has happened in recent years in California and Brazil."},
+      {who:"M",text:"In recent years, the number and size of dams have grown dramatically, increasing concern over the environmental and social impacts of inundating large land surfaces. Modern science and engineering can help mitigate some of these effects, like the destruction of ancient monuments. The relocation of the three-thousand-year-old Abu Simbel temples in Egypt, which would otherwise have been submerged, was indeed an engineering marvel. Another issue is the loss of fertile soils which would otherwise be deposited in delta regions. This loss can be mitigated with the use of fertilisers to replenish the soil. Dams, however, do submerge entire ecosystems. Once submerged, these environments, and the biodiversity they support, are lost for good. The displacement of communities that occurs as a result of damming rivers is one of the most profound human costs. Even when financial compensation and resettlement programs are provided, the emotional, cultural, and psychological toll of being uprooted from ancestral homes can be devastating. Finally and most critically, dams can and have failed due to structural weaknesses or seismic action, causing numerous deaths and unimaginable hardship."},
+      {who:"M",text:"So given that long-term reliance on dams is undesirable and unsustainable, it's crucial to explore alternative solutions for water storage and flood control. One promising solution is the use of groundwater. However its extraction needs to be carefully managed. Improper extraction can cause chemical imbalances in the water that pose risks to human and environmental health. Another potential solution is the recycling of wastewater though the yuck factor remains a major psychological barrier for many. In some communities, rainwater harvesting through simple tanks offers an effective way to capture water during the rainy months. These require minimal capital investment and are simple to install. For flood control, restoring degraded wetlands to their natural state provides a valuable, natural buffer against coastal flooding, but the process of re-establishing proper water flows can be complex. There's also the possibility of using permeable pavement materials to construct roads and parking lots. They're only slightly more expensive than traditional building materials, but much more effective in absorbing flood waters, particularly in urban areas."}
+    ],
+    questions:[
+      {q:"Which functions of dams does the speaker say are sometimes ineffective?",options:{A:"their reliability as a power source",B:"their capacity to store water",C:"their ability to manage flooding",D:"their use in farming",E:"their use in transportation"},answer:["A","B","C"],
+       explain:"储水（arid 地区损失达 30%）、防洪（极端降雨反而致下游洪灾）、发电（久旱时中断，加州/巴西）都「sometimes ineffective」。农业(D)、航运(E) 文中作为「有效」功能陈述，故不选。"},
+      {q:"Which environmental and social impacts of dams does the speaker express concern about?",options:{A:"disruption to local ecosystems",B:"displacement of communities",C:"destruction of ancient monuments",D:"loss of soil fertility",E:"risk of dam failure"},answer:["A","B","E"],
+       explain:"淹没生态系统（lost for good）、社区迁移（most profound human cost）、溃坝（most critically... deaths）是担忧。古迹(C)、土壤肥力(D) 文中明说「可被缓解（mitigated）」，故不是担忧。"},
+      {q:"Which alternatives to dams does the speaker think can be implemented without major challenges?",options:{A:"wastewater recycling",B:"building permeable pavements",C:"groundwater extraction",D:"rainwater harvesting",E:"restoring wetlands"},answer:["B","D"],
+       explain:"透水路面（仅略贵、更有效）与雨水收集（投入少、易安装）可无大碍地实施。地下水(C 需谨慎管理)、废水回收(A 有「yuck factor」)、湿地恢复(E 过程复杂) 都存在挑战。"}
+    ]
+  }
+},
+
+/* ==================== 原创练习卷 ==================== */
+{
+  name:"Listening Test 2（练习）",
+  topics:"八情景 · 可再生能源演讲 · 购物中心之争 · 电动汽车",
+  stage1:{
+    intro:"你会听到八个情景中的对话或独白。第 1–10 题，从 A、B、C 中选出最佳答案。",
+    transcript:[
+      {who:"N",text:"Stage one. You will hear people talking in eight different situations."},
+      {who:"N",text:"Question one. You hear two friends talking about a concert they went to."},
+      {who:"M",text:"So, what did you think of the concert last night? The band sounded amazing, didn't they?"},
+      {who:"W",text:"The music was great, yeah. Shame we could hardly see anything from the back, though."},
+      {who:"M",text:"True, the view wasn't the best. But the sound quality more than made up for it."},
+      {who:"W",text:"I suppose. And it did go on much longer than I expected, nearly three hours!"},
+      {who:"M",text:"I know, I was exhausted by the end, but it was worth it."},
+      {who:"N",text:"Question two. You hear a shop assistant talking about her job."},
+      {who:"W",text:"I've been working here for about six months now. The hours can be long, and my feet ache by the end of a shift, but honestly I really look forward to coming in. It's the customers, you never know who you'll meet, and helping someone find exactly what they need is so rewarding. My manager keeps offering me more responsibility, which is nice, though I'm not sure I want to move into management just yet. For now, I'm happy where I am."},
+      {who:"N",text:"Question three. You hear part of a radio programme."},
+      {who:"M",text:"If you're looking for something to do this weekend, this is well worth a visit. You'll find over two hundred stalls selling everything from fresh vegetables and homemade bread to handmade jewellery and second-hand books. It's on every Saturday morning in the town square, and entry is completely free. Get there early, though, the best produce goes quickly!"},
+      {who:"N",text:"Question four. You hear a student talking about an online course."},
+      {who:"M",text:"I signed up for this online coding course a couple of months ago. It wasn't cheap, but I'd say it's been worth every penny. The lessons are really clearly explained, and I can go at my own pace, which suits me. I did worry at first that studying online would be lonely, but there's a great forum where you can ask questions. I'd definitely recommend it to anyone thinking of learning to code."},
+      {who:"N",text:"Question five. You hear two colleagues talking about a work meeting."},
+      {who:"W",text:"So, what did you make of the meeting this morning?"},
+      {who:"M",text:"Honestly? It went on far too long. We could have covered everything in half the time."},
+      {who:"W",text:"I thought exactly the same. An hour and a half for something that should've been twenty minutes."},
+      {who:"M",text:"And half of it wasn't even relevant to us."},
+      {who:"W",text:"Still, at least we finally got a decision on the budget."},
+      {who:"N",text:"Question six. You hear a runner talking about a marathon."},
+      {who:"W",text:"I finished the marathon, which is the main thing! My time was a bit slower than I'd hoped, but given how hot it was, I'm not going to beat myself up about it. The crowds along the route were amazing, total strangers shouting my name off my running vest. That kept me going in the last few kilometres. I'm already looking at which race to enter next; I've caught the bug now."},
+      {who:"N",text:"Question seven. You hear two people talking about a film."},
+      {who:"M",text:"Did you see that new film everyone's talking about?"},
+      {who:"W",text:"The one set during the war? Yeah. I didn't expect to cry, but I did."},
+      {who:"M",text:"Me too. It really shows what those families went through, being separated for years."},
+      {who:"W",text:"The acting was incredible. You really felt for them."},
+      {who:"N",text:"Question eight. You hear two friends talking about a place they stayed."},
+      {who:"W",text:"I loved where we stayed, didn't you? So peaceful, right out in the countryside."},
+      {who:"M",text:"Yeah, waking up to the sound of birds instead of traffic. And the owner cooked us breakfast every morning."},
+      {who:"W",text:"That's right, a proper home-cooked breakfast. Only six rooms, so it never felt crowded."},
+      {who:"M",text:"Much nicer than a big hotel."},
+      {who:"N",text:"Question nine. You hear a manager talking to some new staff."},
+      {who:"W",text:"Welcome, everyone. Before you start, a few things. Don't worry about knowing everything on day one, nobody expects that, and you'll pick it up as you go. If you're ever unsure about something, just ask; there's always someone happy to help. I'd rather you asked than guessed. We were all new once. Right, let's get you set up."},
+      {who:"N",text:"Question ten. You hear part of a radio programme in which a chef is talking about why he started cooking."},
+      {who:"M",text:"People assume I trained at some fancy college, but actually I fell into cooking almost by accident. I was working in a restaurant kitchen just washing dishes to pay the rent, and one night the chef was short-staffed and threw me in at the deep end. I loved it instantly, the pressure, the teamwork, seeing people enjoy what you've made. I never went back to my old plans. Sometimes the best things happen when you least expect them."}
+    ],
+    questions:[
+      {ctx:"You hear two friends talking about a concert they went to.",q:"What do they agree about?",options:{A:"The view was poor.",B:"The concert was too short.",C:"The tickets were expensive."},answer:"A",explain:"两人都提到看不清：「hardly see anything from the back」「the view wasn't the best」= view was poor。B 与「went on much longer than expected」相反；C 未提到票价。"},
+      {ctx:"You hear a shop assistant talking about her job.",q:"How does she feel about it?",options:{A:"tired of the long hours",B:"keen to be promoted soon",C:"genuinely enjoys the work"},answer:"C",explain:"「really look forward to coming in / so rewarding / happy where I am」= 真心喜欢。A 虽脚酸但仍期待上班，非「厌倦」；B「not sure I want management yet」与「急于升职」相反。"},
+      {ctx:"You hear part of a radio programme.",q:"What is the speaker talking about?",options:{A:"a music festival",B:"a local market",C:"a cookery class"},answer:"B",explain:"「stalls selling vegetables, bread, jewellery, second-hand books / town square / entry free」= 集市。A 音乐节、C 烹饪课都是干扰。"},
+      {ctx:"You hear a student talking about an online course.",q:"What does he say about it?",options:{A:"It was a waste of money.",B:"It is too difficult for beginners.",C:"It is well taught."},answer:"C",explain:"「lessons really clearly explained / worth every penny / recommend it」= 教得好。A 与「worth every penny」相反；B 未说太难，反而「go at my own pace」。"},
+      {ctx:"You hear two colleagues talking about a work meeting.",q:"What do they agree about?",options:{A:"The meeting was much too long.",B:"The decision was wrong.",C:"Too few people attended."},answer:"A",explain:"两人都说太长：「went on far too long」「thought exactly the same」= too long。B 未说决定错（反而「finally got a decision」）；C 未提到人数。"},
+      {ctx:"You hear a runner talking about a marathon.",q:"How does she feel about it?",options:{A:"disappointed with her finishing time",B:"determined to keep competing",C:"surprised the route was so hot"},answer:"B",explain:"「already looking at which race to enter next / caught the bug」= 决心继续参赛。A 虽慢于预期但「not going to beat myself up」，非失望；C 天热是事实，但没有「惊讶」。"},
+      {ctx:"You hear two people talking about a film.",q:"What is the film about?",options:{A:"a famous battle",B:"a love story",C:"a war and its effect on families"},answer:"C",explain:"「set during the war / what those families went through, being separated」= 战争及其对家庭的影响。A 具体战役、B 爱情故事都是干扰。"},
+      {ctx:"You hear two friends talking about a place they stayed.",q:"What kind of place was it?",options:{A:"a campsite",B:"a small guesthouse",C:"a city apartment"},answer:"B",explain:"「owner cooked breakfast / only six rooms / much nicer than a big hotel」= 小旅馆（家庭式）。A 露营地（有房间、供早餐）不符；C 与「countryside」相反。"},
+      {ctx:"You hear a manager talking to some new staff.",q:"What is she doing?",options:{A:"reassuring the new staff",B:"warning them about mistakes",C:"explaining the company's history"},answer:"A",explain:"「Don't worry / nobody expects that / we were all new once」= 安抚新员工。B 并未警告犯错；C 未讲公司历史。"},
+      {ctx:"You hear part of a radio programme in which a chef is talking about why he started cooking.",q:"Why did he become a chef?",options:{A:"He had always dreamed of it.",B:"He discovered it by chance.",C:"His family encouraged him."},answer:"B",explain:"「fell into cooking almost by accident / when you least expect them」= 偶然发现。A 与「people assume... but actually」相反；C 未提家人。"}
+    ]
+  },
+  stage2:{
+    intro:"你会听到两名学生讨论关于「可再生能源」的演讲。他们对演讲每个部分做了什么决定？从 A–G 中为 5 个部分各选一个（有 2 个不用）。",
+    transcript:[
+      {who:"N",text:"Stage two. You will hear two students discussing their presentation on renewable energy."},
+      {who:"M",text:"Right, let's plan our presentation on renewable energy. We've got fifteen minutes."},
+      {who:"W",text:"OK. Let's start with a quick introduction to the topic, just what renewable energy is and why it matters. We don't need long on that; everyone knows the basics."},
+      {who:"M",text:"Agreed. Then solar power. I found some great diagrams showing how solar panels work, we could put those up on the screen."},
+      {who:"W",text:"Perfect, much clearer than just talking. For wind power, rather than covering every type, why don't we just take one wind farm, the big one off the coast, and go through that in detail?"},
+      {who:"M",text:"Good idea. Now, costs and funding. The figures I've got are from a few years ago, though."},
+      {who:"W",text:"Yes, prices have dropped so fast, we'd better make sure our numbers are current before we present them."},
+      {who:"M",text:"Definitely. And for the conclusion and recommendations, I thought we could hand round a sheet with the key points and some links, so people can read more afterwards."},
+      {who:"W",text:"A handout, yes, good idea. That should do it."}
+    ],
+    parts:[
+      {n:1,label:"Introduction to the topic"},
+      {n:2,label:"Solar power"},
+      {n:3,label:"Wind power"},
+      {n:4,label:"Costs and funding"},
+      {n:5,label:"Conclusion and recommendations"}
+    ],
+    decisions:{A:"Use visuals",B:"Keep it short",C:"Involve other students",D:"Check the facts are up to date",E:"Provide a handout",F:"Focus on one example",G:"Do more online research"},
+    answers:{1:"B",2:"A",3:"F",4:"D",5:"E"},
+    explanations:{
+      1:"「We don't need long on that; everyone knows the basics」= Keep it short (B)。",
+      2:"「diagrams... put those up on the screen」= Use visuals (A)。",
+      3:"「just take one wind farm... go through that in detail」= Focus on one example (F)。",
+      4:"「figures are from a few years ago... make sure our numbers are current」= Check the facts are up to date (D)。",
+      5:"「hand round a sheet... read more afterwards」= Provide a handout (E)。"
+    },
+    unused:["C","G"],
+    unusedNote:"未用 C（让其他学生参与）、G（做更多网络调查）。"
+  },
+  stage3:{
+    intro:"你会听到一男一女讨论是否该建一座新购物中心。判断下面 6 句各符合谁的观点。",
+    transcript:[
+      {who:"N",text:"Stage three. You will hear a man and a woman discussing whether a new shopping centre should be built."},
+      {who:"M",text:"Did you hear they want to build a big new shopping centre on the old factory site?"},
+      {who:"W",text:"I did. Honestly, I think it's a great idea, that site's been derelict for years."},
+      {who:"M",text:"I agree the site needs redeveloping. It's a real eyesore at the moment."},
+      {who:"W",text:"And it would create hundreds of jobs, which this town badly needs."},
+      {who:"M",text:"Maybe, but a lot of those jobs are low-paid and part-time. I'm not convinced it'll really help local people."},
+      {who:"W",text:"Still, more shops would mean more choice for residents."},
+      {who:"M",text:"Do we really need more shops, though? The high street is already struggling. A huge centre could put the small independent shops out of business."},
+      {who:"W",text:"Hmm. You might have a point there, it really would be a shame to lose them."},
+      {who:"M",text:"And then there's the traffic. The roads around there are congested enough already."},
+      {who:"W",text:"Oh, I don't think traffic will be a big problem. They're planning a new car park and better bus links."},
+      {who:"M",text:"I hope you're right. And building on that scale can't be good for the environment, all that extra concrete."},
+      {who:"W",text:"There's not much green space there to lose, though. It's just an old industrial site."},
+      {who:"M",text:"Well, it'll be up to the council in the end."},
+      {who:"W",text:"With the budget problems they've got, I'd be surprised if they turned down the extra tax revenue. But you never know."},
+      {who:"M",text:"True, hard to say. They'll have to weigh up all the objections too."}
+    ],
+    options4:["the man","the woman","the man and the woman","not the man and not the woman"],
+    statements:[
+      {text:"The old factory site should be redeveloped.",answer:2,explain:"男：「the site needs redeveloping, a real eyesore」；女：「a great idea, derelict for years」→ 两人都认为该重新开发。"},
+      {text:"The new jobs created would genuinely benefit local people.",answer:1,explain:"女：「create hundreds of jobs this town badly needs」；男：「low-paid, part-time... not convinced it'll help local people」→ 只有女方认为能真正惠及本地人。"},
+      {text:"The shopping centre would threaten existing small shops.",answer:2,explain:"男：「put the small independent shops out of business」；女：「you might have a point... a shame to lose them」（认同）→ 两人都认为会威胁小店。"},
+      {text:"Traffic will be a serious problem.",answer:0,explain:"男：「roads are congested enough already」；女：「don't think traffic will be a big problem... new car park and bus links」→ 只有男方认为交通会是大问题。"},
+      {text:"The development would cause significant environmental damage.",answer:0,explain:"男：「can't be good for the environment, all that extra concrete」；女：「not much green space to lose, just an old industrial site」（不认同）→ 只有男方认为环境损害严重。"},
+      {text:"The council is certain to approve the plan.",answer:3,explain:"女倾向认为会批（surprised if they turned it down），但补一句「you never know」；男说「hard to say」→ 没有人认为「一定会」批准 = 两人都不是。"}
+    ]
+  },
+  stage4:{
+    intro:"你会听到一段关于「电动汽车」的学生演讲。每题从 A–E 中选出所有正确选项（可能不止一个）。真实考试：录音前有 60 秒看题、结束后有 20 秒检查。",
+    transcript:[
+      {who:"N",text:"Stage four. You will hear part of a student presentation about electric vehicles."},
+      {who:"W",text:"Today I'll look at electric vehicles, or EVs, and how well they really deliver on their promises. First, the benefits. EVs produce no exhaust fumes at the tailpipe, which greatly improves air quality in cities, a clear win. They're also much cheaper to run: electricity costs far less than petrol, and with fewer moving parts, they need less maintenance and rarely break down. They're quiet, too, which reduces noise pollution."},
+      {who:"W",text:"However, the picture isn't entirely positive. The batteries are expensive, which makes the cars themselves costly to buy, though prices are falling. Charging can be slow and, in many areas, there simply aren't enough public charging points yet. And while EVs are clean to drive, making the batteries requires mining rare metals, which causes real environmental damage. There's also the question of where the electricity comes from, if it's generated by burning coal, the benefits shrink."},
+      {who:"W",text:"So what can be done to make EVs more sustainable? One priority is recycling the batteries, so the valuable metals can be recovered and reused rather than mined again. This is already technically possible, though not yet done on a large enough scale. Governments can also expand the charging network, especially fast chargers along major roads, which is straightforward but expensive. Encouraging people to charge overnight, when demand is low, helps balance the electricity grid and costs very little to set up. Finally, the single most important step is to generate the electricity itself from renewable sources like wind and solar, without that, EVs can never be truly clean."}
+    ],
+    questions:[
+      {q:"Which advantages of electric vehicles does the speaker mention?",options:{A:"better urban air quality",B:"lower running costs",C:"faster acceleration",D:"reduced noise",E:"a longer driving range"},answer:["A","B","D"],
+       explain:"改善城市空气（no exhaust fumes）、更省钱（cheaper to run）、更安静（reduces noise pollution）都被提到。加速(C)、续航里程(E) 未提及（充电反而是缺点）。"},
+      {q:"Which drawbacks of electric vehicles does the speaker mention?",options:{A:"a high purchase price",B:"slow charging",C:"short battery life",D:"the environmental cost of making batteries",E:"a lack of charging points"},answer:["A","B","D","E"],
+       explain:"购车贵（batteries expensive → costly to buy）、充电慢（charging can be slow）、造电池破坏环境（mining rare metals）、充电桩不足（not enough public charging points）都被提到。电池寿命短(C) 未提及。"},
+      {q:"Which solutions does the speaker say involve a challenge or a high cost?",options:{A:"recycling batteries",B:"expanding the fast-charging network",C:"encouraging overnight charging",D:"generating electricity from renewables",E:"lowering road taxes"},answer:["A","B"],
+       explain:"回收电池「尚未大规模实现（not yet done on a large enough scale）」= 有挑战；扩建快充网络「straightforward but expensive」= 成本高。夜间充电(C)「costs very little」是便宜方案；D 未被描述为有挑战；E 未提及。"}
+    ]
+  }
+}
+];
+
+const STAGE_KEYS=["stage1","stage2","stage3","stage4"];
+const STAGE_NAMES={
+  stage1:"Stage 1 · Multiple Choice（八情景 · 三选一）",
+  stage2:"Stage 2 · Matching（部分配决定）",
+  stage3:"Stage 3 · Who Thinks What（观点归属）",
+  stage4:"Stage 4 · Multi-select（多选）"
+};
+const MAX={stage1:10,stage2:5,stage3:6,stage4:3};
+
+/* ==================== 状态 ==================== */
+let testIndex=0, stageIdx=0, responses={};
+let swInterval=null, swSec=0;
+const playedSet=new Set();
+const $=id=>document.getElementById(id);
+const app=()=>$("app");
+
+/* ==================== 语音 ==================== */
+let VOICES=[];
+function loadVoices(){ try{VOICES=window.speechSynthesis.getVoices()||[];}catch(e){VOICES=[];} }
+if(window.speechSynthesis){ loadVoices(); window.speechSynthesis.onvoiceschanged=loadVoices; }
+function pickVoice(g){
+  const en=VOICES.filter(v=>/^en[-_]?/i.test(v.lang));
+  const pool=en.length?en:VOICES;
+  let re=/./;
+  if(g==="M") re=/(male|daniel|arthur|george|fred|alex|guy|aaron|Google UK English Male|David|Mark)/i;
+  else if(g==="W") re=/(female|samantha|kate|serena|victoria|karen|moira|tessa|fiona|Google UK English Female|Zira|Hazel|Susan)/i;
+  return pool.find(v=>re.test(v.name))||pool[0]||null;
+}
+function stopAudio(){ try{window.speechSynthesis.cancel();}catch(e){} }
+function speakLines(lines,onEnd){
+  if(!window.speechSynthesis){ alert("你的浏览器不支持语音朗读，请换用 Chrome / Safari。"); if(onEnd)onEnd(); return; }
+  stopAudio();
+  lines.forEach((ln,i)=>{
+    const u=new SpeechSynthesisUtterance(ln.text);
+    const v=pickVoice(ln.who); if(v)u.voice=v;
+    u.lang=(v&&v.lang)||"en-GB";
+    u.rate=0.95;
+    u.pitch = ln.who==="M"?0.85:(ln.who==="W"?1.15:1.0);
+    if(i===lines.length-1 && onEnd) u.onend=onEnd;
+    window.speechSynthesis.speak(u);
+  });
+}
+function playOnce(key,btn,lines){
+  if(playedSet.has(key))return;
+  playedSet.add(key);
+  btn.disabled=true; btn.textContent="🔊 录音播放中…（仅此一次）";
+  speakLines(lines,()=>{ btn.textContent="✓ 录音已播放完毕"; });
+}
+function audioBox(stKey,lines){
+  const key=testIndex+"-"+stKey;
+  const done=playedSet.has(key);
+  return `<div class="audio-box">
+    <div class="ai">🎧</div>
+    <div class="info"><b>录音 · 仅播放一次</b><br>先花点时间看清题目，准备好后再点播放。播放后无法重听（与真实考试一致）。</div>
+    <button class="play-btn" ${done?"disabled":""} onclick="playOnce('${key}',this,LISTEN_TESTS[${testIndex}].${stKey}.transcript)">${done?"✓ 已播放":"▶ 播放录音"}</button>
+  </div>`;
+}
+
+/* ==================== 计时（正计时，仅参考）==================== */
+function startSW(){ clearInterval(swInterval); swSec=0; renderSW(); $("timer").classList.remove("hidden");
+  swInterval=setInterval(()=>{swSec++;renderSW();},1000); }
+function renderSW(){ const m=Math.floor(swSec/60),s=swSec%60; $("timer").textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+function stopSW(){ clearInterval(swInterval); $("timer").classList.add("hidden"); }
+
+/* ==================== 进度 ==================== */
+function renderProgress(){
+  const sp=$("stageProgress"); sp.classList.remove("hidden");
+  sp.innerHTML=[1,2,3,4].map((n,i)=>{let c="dot";if(i<stageIdx)c+=" done";if(i===stageIdx)c+=" active";
+    return `<div class="${c}">${i<stageIdx?"✓":n}</div>`;}).join("");
+}
+
+/* ==================== 首页 ==================== */
+function renderHome(){
+  stopSW(); stopAudio(); $("stageProgress").classList.add("hidden");
+  $("tbTitle").textContent="BE10 Listening Test — 完整模拟考";
+  $("tbSub").textContent="选择一套试卷开始";
+  const cards=LISTEN_TESTS.map((t,i)=>`
+    <div class="test-card" onclick="startTest(${i})">
+      <h3>${t.name}</h3>
+      <div class="muted" style="font-size:13px">${t.topics}</div>
+      <ul>
+        <li>Stage 1 三选一 · 10 题</li>
+        <li>Stage 2 部分配决定 · 5 题</li>
+        <li>Stage 3 观点归属 · 6 题</li>
+        <li>Stage 4 多选 · 3 题</li>
+      </ul>
+      <p style="margin:14px 0 0"><button class="primary" style="width:100%">开始 ▶</button></p>
+    </div>`).join("");
+  app().innerHTML=`
+    <div class="card">
+      <h1>BE10 Listening 完整模拟考</h1>
+      <p class="muted">两套试卷，各含 4 个 Stage。每个 Stage 有一段录音，<b>只能播放一次</b>；题目全程可用鼠标选中 🖍 高亮。做完给出总分与逐题解析。共 24 题。</p>
+      <div style="background:#faf8fd;border-radius:10px;padding:14px 18px;margin:14px 0;font-size:14px">
+        <b style="color:var(--purple)">🎧 关于录音</b>：本文档提供的是听力原文，网页用浏览器内置语音朗读（对话男女不同声音）。<b>建议用 Chrome 或 Safari</b>，并把音量打开。首次点播放前请确保设备不是静音。
+      </div>
+      <div class="test-cards">${cards}</div>
+    </div>`;
+}
+function startTest(i){ testIndex=i; stageIdx=0; responses={}; $("tbTitle").textContent=LISTEN_TESTS[i].name; runStage(); }
+
+/* ==================== 运行 Stage ==================== */
+function runStage(){
+  stopAudio();
+  const key=STAGE_KEYS[stageIdx]; renderProgress(); $("tbSub").textContent=STAGE_NAMES[key];
+  const st=LISTEN_TESTS[testIndex][key];
+  if(key==="stage1")renderStage1(st);
+  else if(key==="stage2")renderStage2(st);
+  else if(key==="stage3")renderStage3(st);
+  else renderStage4(st);
+  startSW(); window.scrollTo(0,0);
+}
+function nextBtn(){ return `<div class="card center">
+  <button class="primary" onclick="submitStage()">提交本部分并继续 ✓</button>
+  <div class="muted" style="margin-top:8px">未作答的题会记为错。</div></div>`; }
+
+/* ---------- Stage 1 ---------- */
+function renderStage1(st){
+  const qs=st.questions.map((q,idx)=>{
+    const opts=Object.entries(q.options).map(([k,v])=>`
+      <label class="opt" data-q="${idx}" data-v="${k}">
+        <input type="radio" name="s1q${idx}" value="${k}" onchange="selOpt('.opt',${idx},'${k}')">
+        <b>${k}.</b> ${v}</label>`).join("");
+    return `<div class="q-block">
+      <div class="q-stem"><span class="q-num">Question ${idx+1}.</span></div>
+      <div class="q-ctx">${q.ctx}</div>
+      <div class="q-stem">${q.q}</div>${opts}</div>`;
+  }).join("");
+  app().innerHTML=`
+    <div class="card"><h2>${STAGE_NAMES.stage1}</h2><p class="muted">${st.intro}</p>
+      <p class="hl-tip">🖍 可选中文字高亮关键词。</p></div>
+    ${audioBox("stage1",st.transcript)}
+    <div class="card highlightable">${qs}</div>
+    ${nextBtn()}`;
+}
+function selOpt(sel,idx,k){ document.querySelectorAll(`${sel}[data-q="${idx}"]`).forEach(o=>o.classList.toggle("sel",o.dataset.v===k)); }
+
+/* ---------- Stage 2 ---------- */
+function renderStage2(st){
+  const rows=st.parts.map(p=>`
+    <div class="match-row">
+      <label>${p.n}. ${p.label}</label>
+      <select data-part="${p.n}" onchange="checkDup('#s2rows')">
+        <option value="">?</option>
+        ${Object.keys(st.decisions).map(k=>`<option value="${k}">${k}</option>`).join("")}
+      </select></div>`).join("");
+  const box=Object.entries(st.decisions).map(([k,v])=>`<li><b>${k}.</b> ${v}</li>`).join("");
+  app().innerHTML=`
+    <div class="card"><h2>${STAGE_NAMES.stage2}</h2><p class="muted">${st.intro}</p>
+      <p class="hl-tip">🖍 可选中文字高亮关键词。</p></div>
+    ${audioBox("stage2",st.transcript)}
+    <div class="grid2">
+      <div class="card highlightable">
+        <h3 style="margin-top:0">演讲的各部分</h3>
+        <div id="s2rows">${rows}</div>
+        <div class="dup-warn hidden" id="s2dup">⚠️ 有决定被重复使用（每个决定只能用一次）</div>
+      </div>
+      <div class="card highlightable" style="background:#faf8fd">
+        <h3 style="margin-top:0">Decisions（A–G）</h3>
+        <ul class="box-list">${box}</ul>
+      </div>
+    </div>
+    ${nextBtn()}`;
+}
+function checkDup(scope){
+  const sels=document.querySelectorAll(`${scope} select`); const c={}; let dup=false;
+  sels.forEach(s=>{if(s.value)c[s.value]=(c[s.value]||0)+1;});
+  sels.forEach(s=>{const d=s.value&&c[s.value]>1;s.classList.toggle("dup",d);if(d)dup=true;});
+  const w=$("s2dup"); if(w)w.classList.toggle("hidden",!dup);
+}
+
+/* ---------- Stage 3 ---------- */
+function renderStage3(st){
+  const rows=st.statements.map((s,i)=>{
+    const opts=st.options4.map((o,oi)=>`
+      <label class="o4opt" data-s="${i}" data-v="${oi}">
+        <input type="radio" name="s3q${i}" value="${oi}" onchange="selOpt('.o4opt',${i},'${oi}')">${o}</label>`).join("");
+    return `<div class="q-block">
+      <div class="q-stem"><span class="q-num">${i+1}.</span> ${s.text}</div>
+      <div class="opt4">${opts}</div></div>`;
+  }).join("");
+  app().innerHTML=`
+    <div class="card"><h2>${STAGE_NAMES.stage3}</h2><p class="muted">${st.intro}</p>
+      <p class="hl-tip">🖍 可选中文字高亮关键词。</p></div>
+    ${audioBox("stage3",st.transcript)}
+    <div class="card highlightable">${rows}</div>
+    ${nextBtn()}`;
+}
+
+/* ---------- Stage 4 ---------- */
+function renderStage4(st){
+  const qs=st.questions.map((q,idx)=>{
+    const opts=Object.entries(q.options).map(([k,v])=>`
+      <label class="chk" data-q="${idx}" data-v="${k}">
+        <input type="checkbox" value="${k}" onchange="toggleChk(${idx},'${k}')">
+        <b>${k}.</b> ${v}</label>`).join("");
+    return `<div class="q-block">
+      <div class="q-stem"><span class="q-num">Question ${idx+1}.</span> ${q.q}</div>
+      <div class="muted" style="margin-bottom:6px">选择所有正确项（可能不止一个）。</div>${opts}</div>`;
+  }).join("");
+  app().innerHTML=`
+    <div class="card"><h2>${STAGE_NAMES.stage4}</h2><p class="muted">${st.intro}</p>
+      <p class="hl-tip">🖍 可选中文字高亮关键词。</p></div>
+    ${audioBox("stage4",st.transcript)}
+    <div class="card highlightable">${qs}</div>
+    ${nextBtn()}`;
+}
+function toggleChk(idx,k){
+  const lab=document.querySelector(`.chk[data-q="${idx}"][data-v="${k}"]`);
+  const inp=lab.querySelector("input"); lab.classList.toggle("sel",inp.checked);
+}
+
+/* ==================== 收集 & 推进 ==================== */
+function collectStage(){
+  const key=STAGE_KEYS[stageIdx];
+  if(key==="stage1"){ const a={};
+    LISTEN_TESTS[testIndex].stage1.questions.forEach((q,i)=>{const c=document.querySelector(`input[name="s1q${i}"]:checked`);a[i]=c?c.value:"";});
+    responses.stage1=a;
+  }else if(key==="stage2"){ const a={};
+    document.querySelectorAll('#s2rows select').forEach(s=>a[s.dataset.part]=s.value); responses.stage2=a;
+  }else if(key==="stage3"){ const a={};
+    LISTEN_TESTS[testIndex].stage3.statements.forEach((s,i)=>{const c=document.querySelector(`input[name="s3q${i}"]:checked`);a[i]=c?parseInt(c.value):-1;});
+    responses.stage3=a;
+  }else{ const a={};
+    LISTEN_TESTS[testIndex].stage4.questions.forEach((q,i)=>{
+      a[i]=[...document.querySelectorAll(`.chk[data-q="${i}"] input:checked`)].map(x=>x.value);});
+    responses.stage4=a;
+  }
+}
+function submitStage(){ collectStage(); stopAudio(); stageIdx++;
+  if(stageIdx<4)runStage(); else { stopSW(); renderResults(); } }
+
+/* ==================== 结果 ==================== */
+function arrEq(a,b){ if(a.length!==b.length)return false; const s=[...b].sort(); return [...a].sort().every((x,i)=>x===s[i]); }
+function renderResults(){
+  const T=LISTEN_TESTS[testIndex];
+  stopAudio(); $("stageProgress").classList.add("hidden"); $("tbSub").textContent="已完成 · 查看结果";
+  // scores
+  let s1=0; T.stage1.questions.forEach((q,i)=>{if((responses.stage1[i]||"")===q.answer)s1++;});
+  let s2=0; for(const k in T.stage2.answers){if((responses.stage2[k]||"")===T.stage2.answers[k])s2++;}
+  let s3=0; T.stage3.statements.forEach((s,i)=>{if(responses.stage3[i]===s.answer)s3++;});
+  let s4=0; T.stage4.questions.forEach((q,i)=>{if(arrEq(responses.stage4[i]||[],q.answer))s4++;});
+  const total=s1+s2+s3+s4;
+
+  const t1=T.stage1.questions.map((q,i)=>{const y=responses.stage1[i]||"—",ok=y===q.answer;
+    return `<tr><td class="center"><b>${i+1}</b></td><td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${q.answer}</b></td><td>${q.explain}</td></tr>`;}).join("");
+  const t2=T.stage2.parts.map(p=>{const y=responses.stage2[p.n]||"—",corr=T.stage2.answers[p.n],ok=y===corr;
+    return `<tr><td>${p.n}. ${p.label}</td><td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${corr}</b></td><td>${T.stage2.explanations[p.n]}</td></tr>`;}).join("");
+  const t3=T.stage3.statements.map((s,i)=>{const yi=responses.stage3[i];const y=yi>=0?T.stage3.options4[yi]:"—";
+    const ok=yi===s.answer; return `<tr><td>${i+1}. ${s.text}</td><td class="center ${ok?'ok':'bad'}">${y} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${T.stage3.options4[s.answer]}</b></td><td>${s.explain}</td></tr>`;}).join("");
+  const t4=T.stage4.questions.map((q,i)=>{const y=(responses.stage4[i]||[]);const ok=arrEq(y,q.answer);
+    return `<tr><td class="center"><b>${i+1}</b></td><td class="center ${ok?'ok':'bad'}">${y.join(",")||"—"} ${ok?'✓':'✗'}</td>
+      <td class="center"><b>${q.answer.join(", ")}</b></td><td>${q.explain}</td></tr>`;}).join("");
+
+  const tr=(key,title)=>{const lines=T[key].transcript.map(l=>`<div class="tr-line"><span class="sp">${l.who==='N'?'▶':(l.who==='M'?'M':'W')}</span>${l.text}</div>`).join("");
+    return `<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:700;color:var(--purple)">📄 展开 ${title} 录音原文</summary>
+      <div style="margin-top:8px">${lines}<p style="margin-top:8px"><button class="ghost" onclick="speakLines(LISTEN_TESTS[${testIndex}].${key}.transcript)">🔊 重新播放录音</button></p></div></details>`;};
+
+  app().innerHTML=`
+    <div class="card"><h1 style="text-align:center">${T.name} · 成绩</h1>
+      <div class="score-big">${total} / 24</div>
+      <div class="stage-scores">
+        <div class="ss"><b>${s1}/10</b><span>Stage 1</span></div>
+        <div class="ss"><b>${s2}/5</b><span>Stage 2</span></div>
+        <div class="ss"><b>${s3}/6</b><span>Stage 3</span></div>
+        <div class="ss"><b>${s4}/3</b><span>Stage 4</span></div></div>
+      <p class="center" style="margin-top:18px">
+        <button class="primary" onclick="startTest(${testIndex})">重做本套 ↺</button>
+        <button class="ghost" onclick="renderHome()" style="margin-left:10px">返回选卷</button></p>
+    </div>
+    <div class="card"><h2>Stage 1 · 三选一</h2>
+      <table class="results"><thead><tr><th>题</th><th>你的答案</th><th>正确</th><th>解析</th></tr></thead><tbody>${t1}</tbody></table>
+      ${tr("stage1","Stage 1")}</div>
+    <div class="card"><h2>Stage 2 · 部分配决定</h2>
+      <table class="results"><thead><tr><th>部分</th><th>你的答案</th><th>正确</th><th>解析</th></tr></thead><tbody>${t2}</tbody></table>
+      <p class="muted" style="margin-top:8px">${T.stage2.unusedNote||""}</p>${tr("stage2","Stage 2")}</div>
+    <div class="card"><h2>Stage 3 · 观点归属</h2>
+      <table class="results"><thead><tr><th>陈述</th><th>你的答案</th><th>正确</th><th>解析</th></tr></thead><tbody>${t3}</tbody></table>
+      ${tr("stage3","Stage 3")}</div>
+    <div class="card"><h2>Stage 4 · 多选</h2>
+      <table class="results"><thead><tr><th>题</th><th>你的答案</th><th>正确</th><th>解析</th></tr></thead><tbody>${t4}</tbody></table>
+      <p class="muted" style="margin-top:8px">多选题需全部选对且不多选才算得分。</p>${tr("stage4","Stage 4")}</div>`;
+  window.scrollTo(0,0);
+}
+
+/* ==================== 高亮 ==================== */
+const hlBtn=$("hlBtn"); let savedRange=null;
+document.addEventListener("mouseup",e=>{
+  if(e.target===hlBtn)return;
+  setTimeout(()=>{
+    const sel=window.getSelection();
+    if(!sel||sel.isCollapsed||!sel.rangeCount){hlBtn.classList.add("hidden");return;}
+    const range=sel.getRangeAt(0); const cont=range.commonAncestorContainer;
+    const el=cont.nodeType===3?cont.parentElement:cont;
+    if(!el||!el.closest(".highlightable")){hlBtn.classList.add("hidden");return;}
+    savedRange=range.cloneRange(); const r=range.getBoundingClientRect();
+    hlBtn.style.top=(window.scrollY+r.top-38)+"px"; hlBtn.style.left=(window.scrollX+r.left+r.width/2-34)+"px";
+    hlBtn.classList.remove("hidden");
+  },10);
+});
+hlBtn.addEventListener("click",()=>{ if(savedRange)highlightRange(savedRange); hlBtn.classList.add("hidden");
+  window.getSelection().removeAllRanges(); savedRange=null; });
+document.addEventListener("click",e=>{
+  const mark=e.target.closest("mark.hl");
+  if(mark&&(!window.getSelection()||window.getSelection().isCollapsed)){
+    const p=mark.parentNode; while(mark.firstChild)p.insertBefore(mark.firstChild,mark); p.removeChild(mark); p.normalize();
+  }
+});
+function highlightRange(range){
+  if(range.collapsed)return;
+  const root=range.commonAncestorContainer.nodeType===3?range.commonAncestorContainer.parentElement:range.commonAncestorContainer;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(node){
+    if(!range.intersectsNode(node))return NodeFilter.FILTER_REJECT;
+    if(node.parentElement.closest("mark.hl"))return NodeFilter.FILTER_REJECT;
+    if(!node.parentElement.closest(".highlightable"))return NodeFilter.FILTER_REJECT;
+    if(!node.textContent.trim())return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT;}});
+  const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const node of nodes){
+    let start=0,end=node.textContent.length;
+    if(node===range.startContainer)start=range.startOffset;
+    if(node===range.endContainer)end=range.endOffset;
+    if(start>=end)continue;
+    const middle=start>0?node.splitText(start):node;
+    if(end-start<middle.textContent.length)middle.splitText(end-start);
+    const mark=document.createElement("mark"); mark.className="hl";
+    middle.parentNode.insertBefore(mark,middle); mark.appendChild(middle);
+  }
+}
+
+/* ==================== 启动 ==================== */
+renderHome();
+</script>
+</body>
+</html>
